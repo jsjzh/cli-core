@@ -250,8 +250,8 @@ export interface CliCommandConfig<O, C, H> {
   }) => void;
 }
 
-export class CliCommand<C = AnyObject, H = AnyObject> {
-  constructor(config: CliCommandConfig<AnyObject, C, H>);
+export class CliCommand<O = AnyObject, C = AnyObject, H = AnyObject> {
+  constructor(config: CliCommandConfig<O, C, H>);
 }
 
 export interface CliCoreConfig<C, H> {
