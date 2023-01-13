@@ -22,7 +22,6 @@ interface CliCommandConfig {
     description: string;
     selects?: string[];
     default?: [any, string];
-    required?: boolean;
   }[];
   commands?: CliCommand[];
   context?: () => { [k: keyof any]: any };
