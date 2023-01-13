@@ -1,12 +1,13 @@
 import type { CronJob, CronJobParameters } from "cron";
 import type { Command } from "commander";
 import type { Logger } from "winston";
+import type { StdioOptions } from "child_process";
 
 export const createRunCmd: (
   logger: Logger,
 ) => (
   cwd?: string,
-) => (cmd: string, showExecuteCmd?: boolean, showStdio?: boolean) => string;
+) => (cmd: string, stdio?: StdioOptions, showExecuteCmd?: boolean) => string;
 
 interface TaskItem {
   title: string;
