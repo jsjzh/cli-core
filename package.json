@@ -1,0 +1,50 @@
+{
+  "name": "@oishi/cli-core",
+  "version": "1.0.0",
+  "description": "创建脚本命令底层框架",
+  "keywords": [
+    "cli",
+    "commander",
+    "command"
+  ],
+  "author": "jsjzh <kimimi_king@163.com>",
+  "license": "ISC",
+  "main": "dist/index.js",
+  "types": "index.d.ts",
+  "files": [
+    "lib",
+    "index.d.ts",
+    "package.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build:typings": "rm -rf ./index.d.ts && npx tsc --project ./",
+    "build:code": "rm -rf ./dist && esbuild src/index.ts --bundle --minify --platform=node --target=node10 --color=true --alias:@=src --outfile=dist/index.js",
+    "build:js": "node build/index.js",
+    "build": "npm run build:typings && npm run build:code"
+  },
+  "homepage": "https://github.com/jsjzh/cli-core#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jsjzh/cli-core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jsjzh/cli-core/issues"
+  },
+  "dependencies": {
+    "commander": "^9.5.0",
+    "cron": "^2.2.0",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "@types/cron": "^2.0.0",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.48.1",
+    "@typescript-eslint/parser": "^5.48.1",
+    "esbuild": "^0.16.17",
+    "eslint": "^8.31.0",
+    "eslint-config-alloy": "^4.9.0",
+    "typescript": "^4.9.4"
+  }
+}
