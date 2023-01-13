@@ -3,7 +3,7 @@ const path = require("path");
 
 esbuild.build({
   entryPoints: ["src/index.ts"],
-  outfile: "dist/index.js",
+  outfile: "lib/index.js",
   platform: "node",
   target: "node10",
   color: true,

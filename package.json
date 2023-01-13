@@ -9,7 +9,7 @@
   ],
   "author": "jsjzh <kimimi_king@163.com>",
   "license": "ISC",
-  "main": "dist/index.js",
+  "main": "lib/index.js",
   "types": "index.d.ts",
   "files": [
     "lib",
@@ -18,8 +18,8 @@
     "README.md"
   ],
   "scripts": {
-    "build:typings": "rm -rf ./index.d.ts && npx tsc --project ./",
-    "build:code": "rm -rf ./dist && esbuild src/index.ts --bundle --minify --platform=node --target=node10 --color=true --alias:@=src --outfile=dist/index.js",
+    "build:typings": "rm -rf ./typings && npx tsc --project ./",
+    "build:code": "rm -rf ./lib && esbuild src/index.ts --bundle --minify --platform=node --target=node10 --color=true --alias:@=src --outfile=lib/index.js",
     "build:js": "node build/index.js",
     "build": "npm run build:typings && npm run build:code",
     "prepublish": "npm run build"
