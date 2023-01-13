@@ -22,6 +22,7 @@ interface CliCommandConfig {
     description: string;
     selects?: string[];
     default?: [any, string];
+    required?: boolean;
   }[];
   commands?: CliCommand[];
   context?: () => { [k: keyof any]: any };
@@ -84,6 +85,8 @@ export default class CliCommand {
 
       opt.selects && option.choices(opt.selects);
       opt.default && option.default.apply(option, opt.default);
+
+      if (opt.required) option.required = true;
 
       return option;
     });
