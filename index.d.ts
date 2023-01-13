@@ -54,7 +54,6 @@ interface CliCommandConfig {
     description: string;
     selects?: string[];
     default?: [any, string];
-    reqiured?: boolean;
   }[];
   commands?: CliCommand[];
   context?: () => {

@@ -86,8 +86,6 @@ export default class CliCommand {
       opt.selects && option.choices(opt.selects);
       opt.default && option.default.apply(option, opt.default);
 
-      if (opt.required) option.required = true;
-
       return option;
     });
 
