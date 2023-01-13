@@ -38,7 +38,7 @@ interface IArg {
   default?: [any, string];
 }
 
-export interface CliCommandConfig<O = AnyObject, C = AnyObject, H = AnyObject> {
+export interface CliCommandConfig<O, C, H> {
   /**
    * 定义子 command 指令
    *
@@ -250,11 +250,11 @@ export interface CliCommandConfig<O = AnyObject, C = AnyObject, H = AnyObject> {
   }) => void;
 }
 
-export class CliCommand<C, H> {
+export class CliCommand<C = AnyObject, H = AnyObject> {
   constructor(config: CliCommandConfig<AnyObject, C, H>);
 }
 
-export interface CliCoreConfig<C = AnyObject, H = AnyObject> {
+export interface CliCoreConfig<C, H> {
   /**
    * 定义命令行工具的名称
    *
@@ -331,7 +331,7 @@ export interface CliCoreConfig<C = AnyObject, H = AnyObject> {
   helper?: H;
 }
 
-export class CliCore {
-  constructor(config: CliCoreConfig);
+export class CliCore<C = AnyObject, H = AnyObject> {
+  constructor(config: CliCoreConfig<C, H>);
   execute(): void;
 }
