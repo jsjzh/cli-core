@@ -111,7 +111,7 @@ export default class CliCommand {
     });
 
     this.baseConfig.commands.forEach((command) =>
-      command.registerCommand(cliCore),
+      childProgram.addCommand(command.registerCommand(cliCore)),
     );
 
     return childProgram;
