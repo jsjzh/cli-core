@@ -57,7 +57,7 @@ declare module "src/shared/index" {
   export { createLogger, createRunCmd, createRunCron, createRunTask };
 }
 
-declare module "src/index" {
+declare module "src/cliCore" {
   import CliCommand from "src/cliCommand";
   import {
     createLogger,
@@ -66,7 +66,7 @@ declare module "src/index" {
     createRunTask,
   } from "src/shared/index";
   import type { Command } from "commander";
-  interface CliConfig {
+  interface CliCoreConfig {
     name: string;
     version: string;
     description: string;
@@ -78,9 +78,9 @@ declare module "src/index" {
       [k: keyof any]: any;
     };
   }
-  export default class Cli {
+  export default class CliCore {
     program: Command;
-    baseConfig: Required<CliConfig>;
+    baseConfig: Required<CliCoreConfig>;
     helper: {
       logger: ReturnType<typeof createLogger>;
       runCmd: ReturnType<typeof createRunCmd>;
@@ -88,8 +88,8 @@ declare module "src/index" {
       runTask: ReturnType<typeof createRunTask>;
       [k: keyof any]: any;
     };
-    constructor(config: CliConfig);
-    normalizeConfig(config: CliConfig): Required<CliConfig>;
+    constructor(config: CliCoreConfig);
+    normalizeConfig(config: CliCoreConfig): Required<CliCoreConfig>;
     createHelper(): void;
     registerCliCommand(): void;
     execute(): void;
@@ -104,7 +104,7 @@ declare module "src/cliCommand" {
     createRunTask,
   } from "src/shared/index";
   import type { Command } from "commander";
-  import type Cli from "src/index";
+  import type CliCore from "src/cliCore";
   interface CliCommandConfig {
     command: string;
     description: string;
@@ -149,6 +149,16 @@ declare module "src/cliCommand" {
     baseConfig: Required<CliCommandConfig>;
     constructor(config: CliCommandConfig);
     normalizeConfig(config: CliCommandConfig): Required<CliCommandConfig>;
-    registerCommand(cli: Cli): Command;
+    registerCommand(cliCore: CliCore): Command;
   }
+}
+
+declare module "src/index" {
+  import CliCore from "src/cliCore";
+  import CliCommand from "src/cliCommand";
+  const cli: {
+    CliCore: typeof CliCore;
+    CliCommand: typeof CliCommand;
+  };
+  export default cli;
 }

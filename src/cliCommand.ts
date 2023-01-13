@@ -6,7 +6,7 @@ import {
   createRunTask,
 } from "./shared";
 import type { Command } from "commander";
-import type Cli from "./index";
+import type CliCore from "./cliCore";
 
 interface CliCommandConfig {
   command: string;
@@ -62,7 +62,7 @@ export default class CliCommand {
     };
   }
 
-  registerCommand(cli: Cli) {
+  registerCommand(cliCore: CliCore) {
     const childProgram = createCommand(this.baseConfig.command);
     childProgram.description(this.baseConfig.description);
 
@@ -100,14 +100,19 @@ export default class CliCommand {
       this.baseConfig.action!({
         args: _args,
         opts: _opts,
-        context: { ...cli.baseConfig.context(), ...this.baseConfig.context() },
-        helper: { ...cli.helper, ...this.baseConfig.helper },
-        logger: cli.helper.logger,
+        context: {
+          ...cliCore.baseConfig.context(),
+          ...this.baseConfig.context(),
+        },
+        helper: { ...cliCore.helper, ...this.baseConfig.helper },
+        logger: cliCore.helper.logger,
         instance,
       });
     });
 
-    this.baseConfig.commands.forEach((command) => command.registerCommand(cli));
+    this.baseConfig.commands.forEach((command) =>
+      command.registerCommand(cliCore),
+    );
 
     return childProgram;
   }
