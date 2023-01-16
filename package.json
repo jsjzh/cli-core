@@ -33,9 +33,11 @@
   },
   "dependencies": {
     "@types/cron": "^2.0.0",
+    "@types/inquirer": "^9.0.3",
     "@types/node": "^18.11.18",
     "commander": "^10.0.0",
     "cron": "^2.2.0",
+    "inquirer": "^9.1.4",
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1"
   },
