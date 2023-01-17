@@ -214,15 +214,30 @@ export interface CliCommandConfig<O, C, H> {
       /**
        * 定时执行任务
        *
+       * Seconds: 0-59
+       *
+       * Minutes: 0-59
+       *
+       * Hours: 0-23
+       *
+       * Day of Month: 1-31
+       *
+       * Months: 0-11 (Jan-Dec)
+       *
+       * Day of Week: 0-6 (Sun-Sat)
+       *
+       *
        * @example
        *
        * ```ts
-       * props.helper.runCron({
+       * const job = props.helper.runCron({
        *   cronTime: "* * * * * *",
        *   onTick() {
        *     props.logger.info("hello wrold")
        *   },
        * })
+       *
+       * job.start()
        * ```
        */
       runCron: ReturnType<typeof Helper.createRunCron>;
