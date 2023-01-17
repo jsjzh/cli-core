@@ -19,16 +19,16 @@ TODO
 11. 修改 arguments options 传入模式，然后可以结合 inquirer 的传入
     1. 希望实现的一个效果就是，如果是通过 cli 的方式传入参数，那就直接用 cli，如果是缺少什么参数，就会弹出 inquirer 的方式来引导输入，哦对没错，就只有缺少参数的时候，才需要 inquirer 的方式来输入，如果不是必要参数，那就不需要输入，对，这样才对，懂了，牛逼，老子牛逼，哈哈哈哈
     2. 但其实，不一定是缺少参数才要 inquirer？或许还是可以因为 CliCommand 定义一个全局（CliCommand 的全局）的 isPrompt 来开启使用 inquirer？这个可能可以当成一个 feature 来做
+12. 若给值 choices，inquirer 就用 list
+    1. 若有 multiple，则 inquirer 就为 checkbox，且 cli 输入就为 `<xxx...>`
+13. 若无 choices，则根据 default 来确定是 input 还是 number
+    1. 若有 visible，则使用 password 输入
+14. 若无 params，则使用 confirm
+15. 或者用一个固定的选项，比如指定传入 -i 或者 --interactive 就会用交互式的方式来输入内容
 
 ```ts
 // isPrompt: boolean
 // usePrompt: boolean
-
-// 若给值 choices，inquirer 就用 list
-// 若无 choices，则根据 default 来确定是 input 还是 number
-// 若无 params，则使用 confirm
-// checkbox
-// password
 
 interface IArgument {
   [k: string]: {
@@ -36,6 +36,8 @@ interface IArgument {
     required?: boolean;
     default?: string | [any, string];
     choices?: string[];
+    multiple?: boolean;
+    visible?: boolean;
   };
 }
 
@@ -46,6 +48,8 @@ interface IOption {
     required?: boolean;
     default?: string | [any, string];
     choices?: string[];
+    multiple?: boolean;
+    visible?: boolean;
   };
 }
 ```

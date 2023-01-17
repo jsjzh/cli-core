@@ -11,24 +11,28 @@ import type CliCore from "./cliCore";
 interface CliCommandConfig {
   command: string;
   description: string;
+  usePrompt: boolean;
   arguments?: {
-    name: string;
-    description: string;
-    default?: string | [any, string];
-    choices?: string | number[];
-  }[];
+    [k: string]: {
+      description?: string;
+      required?: boolean;
+      default?: string | [any, string];
+      choices?: string | number[];
+      multiple?: boolean;
+      visible?: boolean;
+    };
+  };
   options?: {
-    name: string;
-    description: string;
-    default?: string | [any, string];
-    choices?: string | number[];
-  }[];
-  prompts?: {
-    name: string;
-    message: string;
-    default?: string | [any, string];
-    choices?: string | number[];
-  }[];
+    [k: string]: {
+      short?: string;
+      description?: string;
+      required?: boolean;
+      default?: string | [any, string];
+      choices?: string | number[];
+      multiple?: boolean;
+      visible?: boolean;
+    };
+  };
   commands?: CliCommand[];
   context?: () => { [k: keyof any]: any };
   helper?: { [k: keyof any]: any };
@@ -75,7 +79,7 @@ export default class CliCommand {
     const commandArguments = this.baseConfig.arguments.map((arg) => {
       const argument = createArgument(arg.name, arg.description);
 
-      arg.choices && argument.choices(arg.choices);
+      arg.selects && argument.choices(arg.selects);
       arg.default && argument.default.apply(argument, arg.default);
 
       return argument;
@@ -88,7 +92,7 @@ export default class CliCommand {
     const commandOptions = this.baseConfig.options.map((opt) => {
       const option = createOption(opt.name, opt.description);
 
-      opt.choices && option.choices(opt.choices);
+      opt.selects && option.choices(opt.selects);
       opt.default && option.default.apply(option, opt.default);
 
       return option;
