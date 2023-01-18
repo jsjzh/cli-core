@@ -19,6 +19,7 @@ TODO
 11. 修改 arguments options 传入模式，然后可以结合 inquirer 的传入
     1. 希望实现的一个效果就是，如果是通过 cli 的方式传入参数，那就直接用 cli，如果是缺少什么参数，就会弹出 inquirer 的方式来引导输入，哦对没错，就只有缺少参数的时候，才需要 inquirer 的方式来输入，如果不是必要参数，那就不需要输入，对，这样才对，懂了，牛逼，老子牛逼，哈哈哈哈
     2. 但其实，不一定是缺少参数才要 inquirer？或许还是可以因为 CliCommand 定义一个全局（CliCommand 的全局）的 isPrompt 来开启使用 inquirer？这个可能可以当成一个 feature 来做
+12. 定时任务应该给做到框架外，比如能通过参数的形式传进去
 
 ```ts
 // isPrompt: boolean
