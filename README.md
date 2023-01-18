@@ -25,6 +25,7 @@ TODO
     1. 若有 visible，则使用 password 输入
 14. 若无 params，则使用 confirm
 15. 或者用一个固定的选项，比如指定传入 -i 或者 --interactive 就会用交互式的方式来输入内容
+16. 定时任务应该给做到框架外，比如能通过参数的形式传进去
 
 ```ts
 // isPrompt: boolean
