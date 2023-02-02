@@ -20,9 +20,9 @@ const createLogger = (option: ICreateLoggerOption) =>
     transports: [
       new DailyRotateFile({
         level: "warn",
-        datePattern: "YYYY-MM-DD-HH",
+        datePattern: "YYYY-MM-DD",
         filename: "%DATE%.log",
-        dirname: `${process.env.HOME}/.oishi/logs/${option.appName}`,
+        dirname: `${process.env.HOME}/logs/oishi/${option.appName}`,
         maxSize: "20m",
         maxFiles: "14d",
         format: winston.format.combine(
@@ -31,7 +31,7 @@ const createLogger = (option: ICreateLoggerOption) =>
           winston.format.splat(),
           winston.format.ms(),
           winston.format.timestamp(),
-          winston.format.prettyPrint(),
+          winston.format.simple(),
         ),
       }),
       new winston.transports.Console({

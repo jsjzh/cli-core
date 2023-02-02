@@ -21,7 +21,8 @@
     "build:typings": "rm -rf ./typings && npx tsc --project ./",
     "build:code": "rm -rf ./lib && esbuild src/index.ts --bundle --minify --platform=node --target=node10 --color=true --alias:@=src --outfile=lib/index.js",
     "build:js": "node build/index.js",
-    "build": "npm run build:typings && npm run build:code"
+    "build": "npm run build:typings && npm run build:code",
+    "test": "node test/index.js"
   },
   "homepage": "https://github.com/jsjzh/cli-core#readme",
   "repository": {
