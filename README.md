@@ -7,19 +7,20 @@ TODO
 ## 待办
 
 1. requireOption
-2. 允许 CliCommand 传入 args opts 的类型
-3. index.d.ts 文件需要完善一下
-4. 是否可以做到事务回滚？
-5. 是否需要把每个 command 的 context 都传到他的子 command？
-6. 将 command 变成一个插件，可以接受外部的 command
-7. 监听文件变化，自动触发任务模式
-8. cron 模式
-9. inquirer 终端交互是不是可以作为功能接入？
-10. 改名执行都为 run or execute
-11. 修改 arguments options 传入模式，然后可以结合 inquirer 的传入
+2. 日志文件有问题，不能把日志都放在项目的目录下
+3. 允许 CliCommand 传入 args opts 的类型
+4. index.d.ts 文件需要完善一下
+5. 是否可以做到事务回滚？
+6. 是否需要把每个 command 的 context 都传到他的子 command？
+7. 将 command 变成一个插件，可以接受外部的 command
+8. 监听文件变化，自动触发任务模式
+9. cron 模式
+10. inquirer 终端交互是不是可以作为功能接入？
+11. 改名执行都为 run or execute
+12. 修改 arguments options 传入模式，然后可以结合 inquirer 的传入
     1. 希望实现的一个效果就是，如果是通过 cli 的方式传入参数，那就直接用 cli，如果是缺少什么参数，就会弹出 inquirer 的方式来引导输入，哦对没错，就只有缺少参数的时候，才需要 inquirer 的方式来输入，如果不是必要参数，那就不需要输入，对，这样才对，懂了，牛逼，老子牛逼，哈哈哈哈
     2. 但其实，不一定是缺少参数才要 inquirer？或许还是可以因为 CliCommand 定义一个全局（CliCommand 的全局）的 isPrompt 来开启使用 inquirer？这个可能可以当成一个 feature 来做
-12. 定时任务应该给做到框架外，比如能通过参数的形式传进去
+13. 定时任务应该给做到框架外，比如能通过参数的形式传进去
 
 ```ts
 // isPrompt: boolean

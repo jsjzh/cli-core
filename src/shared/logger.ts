@@ -22,7 +22,7 @@ const createLogger = (option: ICreateLoggerOption) =>
         level: "warn",
         datePattern: "YYYY-MM-DD-HH",
         filename: "%DATE%.log",
-        dirname: `logs/${option.appName}`,
+        dirname: `${process.env.HOME}/.oishi/logs/${option.appName}`,
         maxSize: "20m",
         maxFiles: "14d",
         format: winston.format.combine(
