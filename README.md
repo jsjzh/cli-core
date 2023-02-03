@@ -21,6 +21,14 @@ TODO
     1. 希望实现的一个效果就是，如果是通过 cli 的方式传入参数，那就直接用 cli，如果是缺少什么参数，就会弹出 inquirer 的方式来引导输入，哦对没错，就只有缺少参数的时候，才需要 inquirer 的方式来输入，如果不是必要参数，那就不需要输入，对，这样才对，懂了，牛逼，老子牛逼，哈哈哈哈
     2. 但其实，不一定是缺少参数才要 inquirer？或许还是可以因为 CliCommand 定义一个全局（CliCommand 的全局）的 isPrompt 来开启使用 inquirer？这个可能可以当成一个 feature 来做
 13. 定时任务应该给做到框架外，比如能通过参数的形式传进去
+14. --interactive -i
+    1. 这个是表示要用交互式
+    2. 另外，交互式也要加到 helper 里面，用户可以自定义
+15. --schedule -s 或者 --cron -c
+    1. 这个考虑一下，是不是要加进入，因为不是所有人都有这个需求，还是
+16. 想办法是不是可以 新的 arguments options 和旧的 arguments options 都接受，想想办法
+17. 用 object 的方式还有一个好处就是可以确切的知道传入了啥，props.args 可以知道
+18. 说不定有可能 arguments 都可以直接剔除，不需要它了（好像的确可以，不用 arguments 也行的）
 
 ```ts
 // isPrompt: boolean
@@ -32,24 +40,60 @@ TODO
 // checkbox
 // password
 
-interface IArgument {
+// Input: 默认
+// List: 若传值 choinces:[xxx, xxx]
+// Confirm: isConfirm:true
+// - Checkbox: isCheckbox:true choices
+// - Password: isVisible:false
+// - Editor: 若传值 isLong:true
+// - Number: 根据 default 为 string 还是 number 来决定
+// - ?RawList: 若传值 isRow:true
+
+const arguments = [
+  {
+    name: "<message>",
+    description: "输入 push 的内容",
+  },
+];
+
+const arguments = {
+  message: {
+    description: "输入 push 的内容",
+    selects: [1, 2, 3, 4, 5],
+    default: [1, 1],
+  },
+};
+
+type IArgument = {
+  name: string;
+  description: string;
+  selects?: string[];
+  default?: [any, string];
+}[];
+
+type INewArgument = {
   [k: string]: {
     description?: string;
-    required?: boolean;
     default?: string | [any, string];
-    choices?: string[];
+    choices?: string | number[];
   };
-}
+};
 
-interface IOption {
+type INewOption = {
   [k: string]: {
     short?: string;
     description?: string;
-    required?: boolean;
     default?: string | [any, string];
-    choices?: string[];
+    choices?: string | number[];
   };
-}
+};
+
+type IOption = {
+  name: string;
+  description: string;
+  selects?: string[];
+  default?: [any, string];
+}[];
 ```
 
 ## 草稿
@@ -131,31 +175,4 @@ command: cli
 command: start
 argument: name
 option: dev
-```
-
-```ts
-interface D {
-  arguments?: {
-    [k: string]: {
-      description?: string;
-      required?: boolean;
-      default?: string | [any, string];
-      choices?: string | number[];
-      multiple?: boolean;
-      visible?: boolean;
-    };
-  };
-
-  options?: {
-    [k: string]: {
-      short?: string;
-      description?: string;
-      required?: boolean;
-      default?: string | [any, string];
-      choices?: string | number[];
-      multiple?: boolean;
-      visible?: boolean;
-    };
-  };
-}
 ```
