@@ -132,3 +132,30 @@ command: start
 argument: name
 option: dev
 ```
+
+```ts
+interface D {
+  arguments?: {
+    [k: string]: {
+      description?: string;
+      required?: boolean;
+      default?: string | [any, string];
+      choices?: string | number[];
+      multiple?: boolean;
+      visible?: boolean;
+    };
+  };
+
+  options?: {
+    [k: string]: {
+      short?: string;
+      description?: string;
+      required?: boolean;
+      default?: string | [any, string];
+      choices?: string | number[];
+      multiple?: boolean;
+      visible?: boolean;
+    };
+  };
+}
+```
