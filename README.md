@@ -29,6 +29,7 @@ TODO
 16. 想办法是不是可以 新的 arguments options 和旧的 arguments options 都接受，想想办法
 17. 用 object 的方式还有一个好处就是可以确切的知道传入了啥，props.args 可以知道
 18. 说不定有可能 arguments 都可以直接剔除，不需要它了（好像的确可以，不用 arguments 也行的）
+    1. 不行，这样就不能实现 cli demo xxx xxx xxx 了
 
 ```ts
 // isPrompt: boolean
@@ -42,8 +43,8 @@ TODO
 
 // Input: 默认
 // List: 若传值 choinces:[xxx, xxx]
-// Confirm: isConfirm:true
-// - Checkbox: isCheckbox:true choices
+// Checkbox: isCheckbox:true choices
+// - Confirm: isConfirm:true
 // - Password: isVisible:false
 // - Editor: 若传值 isLong:true
 // - Number: 根据 default 为 string 还是 number 来决定
@@ -52,48 +53,79 @@ TODO
 const arguments = [
   {
     name: "<message>",
-    description: "输入 push 的内容",
+    description: "message",
+    default: [1, "1"],
+    selects: ["1", "2", "3", "4", "5"],
   },
 ];
 
 const arguments = {
   message: {
-    description: "输入 push 的内容",
-    selects: [1, 2, 3, 4, 5],
-    default: [1, 1],
+    description: "message",
+    default: [1, "1"],
+    choices: ["1", "2", "3", "4", "5"],
   },
 };
 
 type IArgument = {
   name: string;
   description: string;
-  selects?: string[];
   default?: [any, string];
+  selects?: string[];
 }[];
 
 type INewArgument = {
   [k: string]: {
     description?: string;
-    default?: string | [any, string];
-    choices?: string | number[];
+    default?: any | [any, string];
+    choices?: (string | number)[];
   };
 };
 
-type INewOption = {
-  [k: string]: {
-    short?: string;
-    description?: string;
-    default?: string | [any, string];
-    choices?: string | number[];
-  };
+const options = [
+  {
+    name: "-v, --version <version>",
+    description: "输入发布时的版本升级方式",
+    default: ["patch", "patch"],
+    selects: ["major", "minor", "patch", "premajor", "preminor", "prepatch"],
+  },
+  {
+    name: "-r, --registry [registry]",
+    description: "输入要发布的 registry",
+    default: ["https://registry.npmjs.org/", "https://registry.npmjs.org/"],
+  },
+];
+
+const options = {
+  version: {
+    short: "v",
+    description: "输入发布时的版本升级方式",
+    default: ["patch", "patch"],
+    required: true,
+    selects: ["major", "minor", "patch", "premajor", "preminor", "prepatch"],
+  },
+  registry: {
+    short: "r",
+    description: "输入要发布的 registry",
+    default: ["https://registry.npmjs.org/", "https://registry.npmjs.org/"],
+  },
 };
 
 type IOption = {
   name: string;
   description: string;
-  selects?: string[];
   default?: [any, string];
+  selects?: string[];
 }[];
+
+type INewOption = {
+  [k: string]: {
+    short?: string;
+    description?: string;
+    default?: any | [any, string];
+    choices?: (string | number)[];
+  };
+};
 ```
 
 ## 草稿
