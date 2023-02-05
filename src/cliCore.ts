@@ -1,5 +1,5 @@
 import { createCommand } from "commander";
-import CliCommand from "./cliCommand";
+import CliCommand from "./_cliCommand";
 import {
   createLogger,
   createPrompt,

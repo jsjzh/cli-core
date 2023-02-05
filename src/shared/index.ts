@@ -1,5 +1,5 @@
 import createLogger from "./logger";
-import createPrompt from "./prompt";
+import createPrompt from "./runPrompt";
 import createRunCmd from "./runCmd";
 import createRunCron from "./runCron";
 import createRunTask from "./runTask";
