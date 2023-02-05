@@ -18,6 +18,7 @@ import type {
 interface IPromptConfig {
   prefix?: string;
   suffix?: string;
+  initialAnswers?: Partial<Answers>;
 }
 
 export class Prompt {
@@ -26,13 +27,10 @@ export class Prompt {
   baseConfig: IPromptConfig;
   initialAnswers: Partial<Answers>;
 
-  constructor(
-    config: IPromptConfig = {},
-    initialAnswers: Partial<Answers> = {},
-  ) {
+  constructor(config: IPromptConfig) {
     this.promptModule = createPromptModule();
     this.baseConfig = config;
-    this.initialAnswers = initialAnswers;
+    this.initialAnswers = config.initialAnswers || {};
     this.prompts = [];
   }
 
@@ -188,3 +186,10 @@ export class Prompt {
   //   return names.length === [...new Set(names)].length;
   // }
 }
+
+const createPrompt =
+  (config: IPromptConfig = {}) =>
+  (initialAnswers: Partial<Answers> = {}) =>
+    new Prompt({ ...config, initialAnswers });
+
+export default createPrompt;

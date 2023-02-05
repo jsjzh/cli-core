@@ -2,6 +2,7 @@ import { createCommand } from "commander";
 import CliCommand from "./cliCommand";
 import {
   createLogger,
+  createPrompt,
   createRunCmd,
   createRunCron,
   createRunTask,
@@ -23,6 +24,7 @@ export default class CliCore {
   baseConfig: Required<CliCoreConfig>;
   helper: {
     logger: ReturnType<typeof createLogger>;
+    runPrompt: ReturnType<typeof createPrompt>;
     runCmd: ReturnType<typeof createRunCmd>;
     runCron: ReturnType<typeof createRunCron>;
     runTask: ReturnType<typeof createRunTask>;
@@ -40,6 +42,7 @@ export default class CliCore {
 
     this.helper = {
       logger,
+      runPrompt: createPrompt({ prefix: this.baseConfig.name }),
       runCmd: createRunCmd(logger),
       runCron: createRunCron(logger),
       runTask: createRunTask(logger),
