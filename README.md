@@ -44,11 +44,38 @@ TODO
 // Input: 默认
 // List: 若传值 choinces:[xxx, xxx]
 // Checkbox: isCheckbox:true choices
-// - Confirm: isConfirm:true
-// - Password: isVisible:false
-// - Editor: 若传值 isLong:true
-// - Number: 根据 default 为 string 还是 number 来决定
-// - ?RawList: 若传值 isRow:true
+// Confirm: isConfirm:true
+// Password: isVisible:false
+// Editor: 若传值 isLong:true
+// Number: 根据 default 为 string 还是 number 来决定
+// RawList: 若传值 isRow:true
+
+// isRequired?: boolean;
+
+interface IInput {}
+
+interface IList {
+  choices?: (string | number)[];
+}
+
+// <xxx...>
+interface ICheckbox {
+  choices?: (string | number)[];
+}
+
+interface IConfirm {}
+
+interface IPassword {
+  isPassword: boolean;
+}
+
+interface IEditor {
+  isEditor: boolean;
+}
+
+interface INumber {}
+
+interface IRawList {}
 
 const arguments = [
   {
@@ -79,6 +106,8 @@ type INewArgument = {
     description?: string;
     default?: any | [any, string];
     choices?: (string | number)[];
+    // 决定 <xxx> or [xxx]
+    isRequired?: boolean;
   };
 };
 
@@ -120,12 +149,34 @@ type IOption = {
 
 type INewOption = {
   [k: string]: {
-    short?: string;
     description?: string;
     default?: any | [any, string];
+    short?: string;
+
+    // 决定 <xxx> or [xxx]
+    isRequired?: boolean;
+
     choices?: (string | number)[];
   };
 };
+
+// const commandArguments = this.baseConfig.arguments.map((arg) => {
+//   const argument = createArgument(arg.name, arg.description);
+
+//   arg.selects && argument.choices(arg.selects);
+//   arg.default && argument.default.apply(argument, arg.default);
+
+//   return argument;
+// });
+
+// const commandOptions = this.baseConfig.options.map((opt) => {
+//   const option = createOption(opt.name, opt.description);
+
+//   opt.selects && option.choices(opt.selects);
+//   opt.default && option.default.apply(option, opt.default);
+
+//   return option;
+// });
 ```
 
 ## 草稿

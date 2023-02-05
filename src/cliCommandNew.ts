@@ -11,25 +11,37 @@ import type CliCore from "./cliCore";
 interface CliCommandConfig {
   command: string;
   description: string;
+  // cli demo <message> xxx
+  // cli demo [message] xxx
   arguments?: {
     [k: string]: {
       description?: string;
-      required?: boolean;
-      default?: string | [any, string];
-      choices?: string | number[];
-      multiple?: boolean;
-      visible?: boolean;
+      default?: string | [string, string];
+      choices?: string[];
+
+      isOptional?: boolean;
+      isMultiple?: boolean;
     };
   };
+  // 基础
+  // cli demo <base> xxx
+  // 短名
+  // cli demo <b> xxx
+  // boolean
+  // cli demo <base>
+  // 可选
+  // cli demo [base]
+  // 多参数
+  // cli demo [base...]
   options?: {
     [k: string]: {
       short?: string;
       description?: string;
-      required?: boolean;
-      default?: string | [any, string];
-      choices?: string | number[];
-      multiple?: boolean;
-      visible?: boolean;
+      default?: string | [string, string];
+      choices?: string[];
+
+      isOptional?: boolean;
+      isMultiple?: boolean;
     };
   };
   commands?: CliCommand[];
@@ -62,8 +74,8 @@ export default class CliCommand {
     return {
       command: config.command,
       description: config.description,
-      arguments: config.arguments || [],
-      options: config.options || [],
+      arguments: config.arguments || {},
+      options: config.options || {},
       commands: config.commands || [],
       context: config.context || (() => ({})),
       helper: config.helper || {},
@@ -75,24 +87,44 @@ export default class CliCommand {
     const childProgram = createCommand(this.baseConfig.command);
     childProgram.description(this.baseConfig.description);
 
-    const commandArguments = this.baseConfig.arguments.map((arg) => {
-      const argument = createArgument(arg.name, arg.description);
+    const commandArguments = Object.keys(this.baseConfig.arguments).map(
+      (key) => {
+        const item = this.baseConfig.arguments[key];
+        const name = item.isMultiple ? `${key}...` : key;
+        const cmd = item.isOptional ? `[${name}]` : `<${name}>`;
+        const argument = createArgument(cmd, item.description);
+        Array.isArray(item.choices) && argument.choices(item.choices);
+        if (item.default) {
+          argument.default.apply(
+            argument,
+            Array.isArray(item.default)
+              ? item.default
+              : [item.default, item.default],
+          );
+        }
 
-      arg.selects && argument.choices(arg.selects);
-      arg.default && argument.default.apply(argument, arg.default);
-
-      return argument;
-    });
+        return argument;
+      },
+    );
 
     commandArguments.forEach((commandArgument) =>
       childProgram.addArgument(commandArgument),
     );
 
-    const commandOptions = this.baseConfig.options.map((opt) => {
-      const option = createOption(opt.name, opt.description);
-
-      opt.selects && option.choices(opt.selects);
-      opt.default && option.default.apply(option, opt.default);
+    const commandOptions = Object.keys(this.baseConfig.options).map((key) => {
+      const item = this.baseConfig.options[key];
+      const name = item.isMultiple ? `${key}...` : key;
+      const cmd = item.isOptional ? `[${name}]` : `<${name}>`;
+      const option = createOption(cmd, item.description);
+      Array.isArray(item.choices) && option.choices(item.choices);
+      if (item.default) {
+        option.default.apply(
+          option,
+          Array.isArray(item.default)
+            ? item.default
+            : [item.default, item.default],
+        );
+      }
 
       return option;
     });
