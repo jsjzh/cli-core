@@ -4,6 +4,37 @@
 
 TODO
 
+```ts
+interface App {
+  name: string;
+  version: string;
+  description: string;
+  commands?: Command[];
+}
+
+interface Command {
+  command: string;
+  description: string;
+  commands?: Command[];
+  arguments?: { [k: string]: IArguments };
+  options?: { [k: string]: IOptions };
+}
+
+interface IBaseParams {
+  description: string;
+  default?: string | [string, string];
+  choices?: string[];
+  optional?: boolean;
+  multiple?: boolean;
+}
+
+interface IArguments extends IBaseParams {}
+
+interface IOptions extends IBaseParams {
+  alias?: string;
+}
+```
+
 ## 待办
 
 1. requireOption

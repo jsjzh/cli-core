@@ -58,7 +58,6 @@ interface CliCommandConfig {
       runTask: ReturnType<typeof createRunTask>;
       [k: keyof any]: any;
     };
-    instance: Command;
   }) => void;
 }
 
@@ -160,7 +159,6 @@ export default class CliCommand {
         },
         helper: { ...cliCore.helper, ...this.baseConfig.helper },
         logger: cliCore.helper.logger,
-        instance,
       });
     });
   }
@@ -243,7 +241,6 @@ export default class CliCommand {
             },
             helper: { ...cliCore.helper, ...this.baseConfig.helper },
             logger: cliCore.helper.logger,
-            instance: this.childProgram,
           });
         });
       })
