@@ -142,6 +142,9 @@ export default class CliCommand {
     option.default(false, "不开启");
     childProgram.addOption(option);
 
+    // 艹，发现个问题，他妈的，一旦是 <name> 这样必须的参数
+    // 那特么的，是没有办法进入 action 函数的
+    // 会显示 error: missing required argument 'name'
     childProgram.action((...args) => {
       const instance: Command = args[args.length - 1];
       const _args = args.slice(0, args.length - 2);
@@ -155,7 +158,6 @@ export default class CliCommand {
       let currOpts = omit(_opts, "interactive");
 
       if (_opts.interactive) {
-        // TODO 这里还要添加问题函数
         const prompt = cliCore.helper.runPrompt({
           initialAnswers: { ...currArgs, ...currOpts },
         });
