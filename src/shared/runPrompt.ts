@@ -1,4 +1,5 @@
 import { createPromptModule } from "inquirer";
+import { omit } from "lodash";
 
 import type {
   PromptModule,
@@ -24,12 +25,12 @@ interface IPromptConfig {
 export class Prompt {
   promptModule: PromptModule;
   prompts: Question[];
-  baseConfig: IPromptConfig;
+  baseConfig: Omit<IPromptConfig, "initialAnswers">;
   initialAnswers: Partial<Answers>;
 
   constructor(config: IPromptConfig) {
     this.promptModule = createPromptModule();
-    this.baseConfig = config;
+    this.baseConfig = omit(config, "initialAnswers");
     this.initialAnswers = config.initialAnswers || {};
     this.prompts = [];
   }

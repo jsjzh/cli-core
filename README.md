@@ -30,6 +30,9 @@ TODO
 17. 用 object 的方式还有一个好处就是可以确切的知道传入了啥，props.args 可以知道
 18. 说不定有可能 arguments 都可以直接剔除，不需要它了（好像的确可以，不用 arguments 也行的）
     1. 不行，这样就不能实现 cli demo xxx xxx xxx 了
+19. 遇阻，遇阻，发现问题，在合并 inquirer 和 commander 的时候，我一开始把 inquirer 包裹在 commander 的 action 中，但发现如果缺少参数，action 根本就执行不到，找了文档，发现有个可以重写 commander 的 errorHandler 的方法，把 inquirer 从这里插进去，好的，程序倒是起来了，但是有个问题就是，commander 在执行完 errorHandler 之后，就直接 process.exit() 了，我干他妈的，直接进程给结束掉了，现在，有两个想法
+    1. 第一，是在 commander 干掉进程之前，重启一个进程，这个进程跑 inquirer，这个需要调查一下能不能实现
+    2. 第二，直接在 cli-core 的最外层，CliCore 层，接收 -i 参数，执行 cli -i 可以通过选择 npm git demo 的方式，一层层下去
 
 ```ts
 // isPrompt: boolean
@@ -127,14 +130,14 @@ const options = [
 
 const options = {
   version: {
-    short: "v",
+    alias: "v",
     description: "输入发布时的版本升级方式",
     default: ["patch", "patch"],
     required: true,
     selects: ["major", "minor", "patch", "premajor", "preminor", "prepatch"],
   },
   registry: {
-    short: "r",
+    alias: "r",
     description: "输入要发布的 registry",
     default: ["https://registry.npmjs.org/", "https://registry.npmjs.org/"],
   },
@@ -151,7 +154,7 @@ type INewOption = {
   [k: string]: {
     description?: string;
     default?: any | [any, string];
-    short?: string;
+    alias?: string;
 
     // 决定 <xxx> or [xxx]
     isRequired?: boolean;

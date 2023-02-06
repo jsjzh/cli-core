@@ -21,7 +21,7 @@ interface IBaseParams {
 interface IArguments extends IBaseParams {}
 
 interface IOptions extends IBaseParams {
-  short?: string;
+  alias?: string;
 }
 
 interface CliCommandConfig {
@@ -63,10 +63,14 @@ interface CliCommandConfig {
 }
 
 export default class CliCommand {
+  childProgram: Command;
   baseConfig: Required<CliCommandConfig>;
 
   constructor(config: CliCommandConfig) {
     this.baseConfig = this.normalizeConfig(config);
+
+    this.childProgram = createCommand(this.baseConfig.command);
+    this.childProgram.description(this.baseConfig.description);
   }
 
   normalizeConfig(config: CliCommandConfig): Required<CliCommandConfig> {
@@ -82,40 +86,34 @@ export default class CliCommand {
     };
   }
 
-  registerCommand(cliCore: CliCore) {
-    const childProgram = createCommand(this.baseConfig.command);
-    childProgram.description(this.baseConfig.description);
+  registerArguments() {
+    Object.keys(this.baseConfig.arguments).forEach((key) => {
+      const item = this.baseConfig.arguments[key];
+      const name = item.multiple ? `${key}...` : key;
+      const cmd = item.optional ? `[${name}]` : `<${name}>`;
+      const argument = createArgument(cmd, item.description);
 
-    const commandArguments = Object.keys(this.baseConfig.arguments).map(
-      (key) => {
-        const item = this.baseConfig.arguments[key];
-        const name = item.multiple ? `${key}...` : key;
-        const cmd = item.optional ? `[${name}]` : `<${name}>`;
-        const argument = createArgument(cmd, item.description);
-        Array.isArray(item.choices) && argument.choices(item.choices);
-        if (item.default) {
-          argument.default.apply(
-            argument,
-            Array.isArray(item.default)
-              ? item.default
-              : [item.default, item.default],
-          );
-        }
+      Array.isArray(item.choices) && argument.choices(item.choices);
+      if (item.default) {
+        argument.default.apply(
+          argument,
+          Array.isArray(item.default)
+            ? item.default
+            : [item.default, item.default],
+        );
+      }
 
-        return argument;
-      },
-    );
+      this.childProgram.addArgument(argument);
+    });
+  }
 
-    commandArguments.forEach((commandArgument) =>
-      childProgram.addArgument(commandArgument),
-    );
-
-    const commandOptions = Object.keys(this.baseConfig.options).map((key) => {
+  registerOptions() {
+    Object.keys(this.baseConfig.options).forEach((key) => {
       const item = this.baseConfig.options[key];
       const name = item.multiple ? `${key}...` : key;
       const cmd = item.optional ? `[${name}]` : `<${name}>`;
-      const currentCmd = item.short
-        ? `-${item.short}, --${key} ${cmd}`
+      const currentCmd = item.alias
+        ? `-${item.alias}, --${key} ${cmd}`
         : `--${key} ${cmd}`;
 
       const option = createOption(currentCmd, item.description);
@@ -131,21 +129,18 @@ export default class CliCommand {
         );
       }
 
-      return option;
+      this.childProgram.addOption(option);
     });
+  }
 
-    commandOptions.forEach((commandOption) =>
-      childProgram.addOption(commandOption),
-    );
-
+  registerInteractive() {
     const option = createOption("-i, --interactive", "开启交互式命令行");
     option.default(false, "不开启");
-    childProgram.addOption(option);
+    this.childProgram.addOption(option);
+  }
 
-    // 艹，发现个问题，他妈的，一旦是 <name> 这样必须的参数
-    // 那特么的，是没有办法进入 action 函数的
-    // 会显示 error: missing required argument 'name'
-    childProgram.action((...args) => {
+  registerAction(cliCore: CliCore) {
+    this.childProgram.action((...args) => {
       const instance: Command = args[args.length - 1];
       const _args = args.slice(0, args.length - 2);
       const _opts = args[args.length - 2];
@@ -157,10 +152,23 @@ export default class CliCommand {
 
       let currOpts = omit(_opts, "interactive");
 
-      if (_opts.interactive) {
-        const prompt = cliCore.helper.runPrompt({
-          initialAnswers: { ...currArgs, ...currOpts },
-        });
+      this.baseConfig.action({
+        data: { ...currArgs, ...currOpts },
+        context: {
+          ...cliCore.baseConfig.context(),
+          ...this.baseConfig.context(),
+        },
+        helper: { ...cliCore.helper, ...this.baseConfig.helper },
+        logger: cliCore.helper.logger,
+        instance,
+      });
+    });
+  }
+
+  registerInteractiveAction(cliCore: CliCore) {
+    this.childProgram
+      .exitOverride((error) => {
+        const prompt = cliCore.helper.runPrompt();
 
         // TODO 还可以补充更多的类型
         // InputQuestion,
@@ -235,27 +243,24 @@ export default class CliCommand {
             },
             helper: { ...cliCore.helper, ...this.baseConfig.helper },
             logger: cliCore.helper.logger,
-            instance,
+            instance: this.childProgram,
           });
         });
-      } else {
-        this.baseConfig.action({
-          data: { ...currArgs, ...currOpts },
-          context: {
-            ...cliCore.baseConfig.context(),
-            ...this.baseConfig.context(),
-          },
-          helper: { ...cliCore.helper, ...this.baseConfig.helper },
-          logger: cliCore.helper.logger,
-          instance,
-        });
-      }
-    });
+      })
+      .configureOutput({ writeErr: (str) => "" });
+  }
+
+  registerCommand(cliCore: CliCore) {
+    this.registerArguments();
+    this.registerOptions();
+    this.registerInteractive();
+    this.registerAction(cliCore);
+    this.registerInteractiveAction(cliCore);
 
     this.baseConfig.commands.forEach((command) =>
-      childProgram.addCommand(command.registerCommand(cliCore)),
+      this.childProgram.addCommand(command.registerCommand(cliCore)),
     );
 
-    return childProgram;
+    return this.childProgram;
   }
 }

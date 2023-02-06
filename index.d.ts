@@ -120,7 +120,7 @@ interface IBaseParams {
 }
 interface IArguments extends IBaseParams {}
 interface IOptions extends IBaseParams {
-  short?: string;
+  alias?: string;
 }
 
 export interface CliCommandConfig {

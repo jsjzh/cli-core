@@ -1,5 +1,5 @@
 import { createCommand } from "commander";
-import CliCommand from "./_cliCommand";
+import CliCommand from "./cliCommand";
 import {
   createLogger,
   createPrompt,
@@ -49,7 +49,6 @@ export default class CliCore {
       ...this.baseConfig.helper,
     };
 
-    this.createHelper();
     this.registerCliCommand();
   }
 
@@ -64,8 +63,6 @@ export default class CliCore {
     };
   }
 
-  createHelper() {}
-
   registerCliCommand() {
     this.baseConfig.commands.forEach((command) =>
       this.program.addCommand(command.registerCommand(this)),
@@ -73,6 +70,6 @@ export default class CliCore {
   }
 
   execute() {
-    this.program.parse();
+    this.program.parseAsync();
   }
 }
