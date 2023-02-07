@@ -22,6 +22,39 @@ interface IPromptConfig {
   initialAnswers?: Partial<Answers>;
 }
 
+interface IBaseConfig {
+  name: string;
+  message: string;
+}
+
+interface IInputConfig extends IBaseConfig {
+  default?: string;
+}
+interface INumberConfig extends IBaseConfig {
+  default?: number;
+}
+interface IConfirmConfig extends IBaseConfig {
+  default?: boolean;
+}
+interface IListConfig extends IBaseConfig {
+  choices: ({ name: string; value: any } | string)[];
+  default?: string;
+}
+interface IRawListConfig extends IBaseConfig {
+  choices: ({ name: string; value: any } | string)[];
+  default?: string;
+}
+interface ICheckboxConfig extends IBaseConfig {
+  choices: ({ name: string; value: any } | string)[];
+  default?: string[];
+}
+interface IPasswordConfig extends IBaseConfig {
+  default?: string;
+}
+interface IEditorConfig extends IBaseConfig {
+  default?: string;
+}
+
 export class Prompt {
   promptModule: PromptModule;
   prompts: Question[];
@@ -35,7 +68,7 @@ export class Prompt {
     this.prompts = [];
   }
 
-  addInput(inputConfig: { name: string; message: string; default?: string }) {
+  addInput(inputConfig: IInputConfig) {
     const inputQuestion: InputQuestion = {
       type: "input",
       name: inputConfig.name,
@@ -49,7 +82,7 @@ export class Prompt {
     return this;
   }
 
-  addNumber(numberConfig: { name: string; message: string; default?: number }) {
+  addNumber(numberConfig: INumberConfig) {
     const numberQuestion: NumberQuestion = {
       type: "number",
       name: numberConfig.name,
@@ -63,11 +96,7 @@ export class Prompt {
     return this;
   }
 
-  addConfirm(confirmConfig: {
-    name: string;
-    message: string;
-    default?: boolean;
-  }) {
+  addConfirm(confirmConfig: IConfirmConfig) {
     const confirmQuestion: ConfirmQuestion = {
       type: "confirm",
       name: confirmConfig.name,
@@ -81,12 +110,7 @@ export class Prompt {
     return this;
   }
 
-  addList(listConfig: {
-    name: string;
-    message: string;
-    choices: ({ name: string; value: any } | string)[];
-    default?: string;
-  }) {
+  addList(listConfig: IListConfig) {
     const listQuestion: ListQuestion = {
       type: "list",
       name: listConfig.name,
@@ -101,18 +125,13 @@ export class Prompt {
     return this;
   }
 
-  addRawList(rawlistConfig: {
-    name: string;
-    message: string;
-    choices: ({ name: string; value: any } | string)[];
-    default?: string;
-  }) {
+  addRawList(rawListConfig: IRawListConfig) {
     const rawListQuestion: RawListQuestion = {
       type: "rawlist",
-      name: rawlistConfig.name,
-      message: rawlistConfig.message,
-      choices: rawlistConfig.choices,
-      default: rawlistConfig.default || this.initialAnswers[rawlistConfig.name],
+      name: rawListConfig.name,
+      message: rawListConfig.message,
+      choices: rawListConfig.choices,
+      default: rawListConfig.default || this.initialAnswers[rawListConfig.name],
       ...this.baseConfig,
     };
 
@@ -123,12 +142,7 @@ export class Prompt {
 
   // addExpand(expandConfig: {}) {}
 
-  addCheckbox(checkboxConfig: {
-    name: string;
-    message: string;
-    choices: ({ name: string; value: any } | string)[];
-    default?: string[];
-  }) {
+  addCheckbox(checkboxConfig: ICheckboxConfig) {
     const checkboxQuestion: CheckboxQuestion = {
       type: "checkbox",
       name: checkboxConfig.name,
@@ -144,11 +158,7 @@ export class Prompt {
     return this;
   }
 
-  addPassword(passwordConfig: {
-    name: string;
-    message: string;
-    default?: string;
-  }) {
+  addPassword(passwordConfig: IPasswordConfig) {
     const passwordQuestion: PasswordQuestion = {
       type: "password",
       name: passwordConfig.name,
@@ -163,7 +173,7 @@ export class Prompt {
     return this;
   }
 
-  addEditor(editorConfig: { name: string; message: string; default?: string }) {
+  addEditor(editorConfig: IEditorConfig) {
     const editorQuestion: EditorQuestion = {
       type: "editor",
       name: editorConfig.name,

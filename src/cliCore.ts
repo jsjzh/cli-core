@@ -17,9 +17,9 @@ interface CliCoreConfig {
   version: string;
   description: string;
   commands?: CliCommand[];
-  context?: () => { [k: string]: any };
-  helper?: { [k: string]: any };
-  // configs: { [k: string]: any };
+  context?: () => Record<string, any>;
+  helper?: Record<string, any>;
+  // configs: Record<string, any>;
 }
 
 export default class CliCore {
@@ -31,8 +31,7 @@ export default class CliCore {
     runCmd: ReturnType<typeof createRunCmd>;
     runCron: ReturnType<typeof createRunCron>;
     runTask: ReturnType<typeof createRunTask>;
-    [k: string]: any;
-  };
+  } & Record<string, any>;
 
   constructor(config: CliCoreConfig) {
     this.baseConfig = this.normalizeConfig(config);

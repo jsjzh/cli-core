@@ -22,55 +22,69 @@ declare namespace Helper {
     suffix?: string;
     initialAnswers?: Partial<Answers>;
   }
+  interface IBaseConfig {
+    name: string;
+    message: string;
+  }
+  interface IInputConfig extends IBaseConfig {
+    default?: string;
+  }
+  interface INumberConfig extends IBaseConfig {
+    default?: number;
+  }
+  interface IConfirmConfig extends IBaseConfig {
+    default?: boolean;
+  }
+  interface IListConfig extends IBaseConfig {
+    choices: (
+      | {
+          name: string;
+          value: any;
+        }
+      | string
+    )[];
+    default?: string;
+  }
+  interface IRawListConfig extends IBaseConfig {
+    choices: (
+      | {
+          name: string;
+          value: any;
+        }
+      | string
+    )[];
+    default?: string;
+  }
+  interface ICheckboxConfig extends IBaseConfig {
+    choices: (
+      | {
+          name: string;
+          value: any;
+        }
+      | string
+    )[];
+    default?: string[];
+  }
+  interface IPasswordConfig extends IBaseConfig {
+    default?: string;
+  }
+  interface IEditorConfig extends IBaseConfig {
+    default?: string;
+  }
   class Prompt {
     promptModule: PromptModule;
     prompts: Question[];
-    baseConfig: IPromptConfig;
+    baseConfig: Omit<IPromptConfig, "initialAnswers">;
     initialAnswers: Partial<Answers>;
     constructor(config: IPromptConfig);
-    addInput(inputConfig: {
-      name: string;
-      message: string;
-      default?: string;
-    }): this;
-    addNumber(numberConfig: {
-      name: string;
-      message: string;
-      default?: number;
-    }): this;
-    addConfirm(confirmConfig: {
-      name: string;
-      message: string;
-      default?: boolean;
-    }): this;
-    addList(listConfig: {
-      name: string;
-      message: string;
-      choices: ({ name: string; value: string } | string)[];
-      default?: string;
-    }): this;
-    addRawList(rawlistConfig: {
-      name: string;
-      message: string;
-      choices: ({ name: string; value: string } | string)[];
-      default?: string;
-    }): this;
-    addCheckbox(checkboxConfig: {
-      name: string;
-      message: string;
-      choices: ({ name: string; value: string } | string)[];
-      default?: string[];
-    }): this;
-    addPassword(passwordConfig: {
-      name: string;
-      message: string;
-      default?: string;
-    }): this;
-    addEditor(editorConfig: {
-      name: string;
-      message: string;
-      default?: string;
-    }): this;
+    addInput(inputConfig: IInputConfig): this;
+    addNumber(numberConfig: INumberConfig): this;
+    addConfirm(confirmConfig: IConfirmConfig): this;
+    addList(listConfig: IListConfig): this;
+    addRawList(rawListConfig: IRawListConfig): this;
+    addCheckbox(checkboxConfig: ICheckboxConfig): this;
+    addPassword(passwordConfig: IPasswordConfig): this;
+    addEditor(editorConfig: IEditorConfig): this;
     execute(callback?: (value: Answers) => void): Promise<void>;
   }
   const createPrompt: (
@@ -100,32 +114,34 @@ interface IOptions extends IBaseParams {
   alias?: string;
 }
 
-export interface CliCommandConfig {
+export interface CliCommandConfig<IArgs, IOpts> {
   command: string;
   description: string;
-  arguments?: { [k: string]: IArguments };
-  options?: { [k: string]: IOptions };
+  arguments?: Record<keyof IArgs, IArguments>;
+  options?: Record<keyof IOpts, IOptions>;
   commands?: CliCommand[];
-  context?: () => { [k: string]: any };
-  helper?: { [k: string]: any };
+  context?: () => Record<string, any>;
+  helper?: Record<string, any>;
   action?: (props: {
-    data: { [k: string]: any };
-    context: { [k: string]: any };
+    data: Partial<Record<keyof IArgs | keyof IOpts, any>>;
+    context: Record<string, any>;
     logger: ReturnType<typeof Helper.createLogger>;
     helper: {
       runPrompt: ReturnType<typeof Helper.createPrompt>;
       runCron: ReturnType<typeof Helper.createRunCron>;
       runCmd: ReturnType<typeof Helper.createRunCmd>;
       runTask: ReturnType<typeof Helper.createRunTask>;
-      [k: string]: any;
-    };
+    } & Record<string, any>;
   }) => void;
 }
 
-export class CliCommand {
+export class CliCommand<
+  IArgs = Record<string, any>,
+  IOpts = Record<string, any>,
+> {
   childProgram: Command;
   baseConfig: Required<CliCommandConfig>;
-  constructor(config: CliCommandConfig);
+  constructor(config: CliCommandConfig<IArgs, IOpts>);
   private normalizeConfig;
   private createArguments;
   private createOptions;
@@ -138,8 +154,8 @@ export interface CliCoreConfig {
   version: string;
   description: string;
   commands?: CliCommand[];
-  context?: () => { [k: string]: any };
-  helper?: { [k: string]: any };
+  context?: () => Record<string, any>;
+  helper?: Record<string, any>;
 }
 
 export class CliCore {
@@ -151,8 +167,7 @@ export class CliCore {
     runCmd: ReturnType<typeof Helper.createRunCmd>;
     runCron: ReturnType<typeof Helper.createRunCron>;
     runTask: ReturnType<typeof Helper.createRunTask>;
-    [k: string]: any;
-  };
+  } & Record<string, any>;
   constructor(config: CliCoreConfig);
   private createProgram;
   private normalizeConfig;

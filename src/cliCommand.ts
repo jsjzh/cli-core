@@ -33,7 +33,7 @@ interface CliCommandConfig {
   // cli demo [message] xxx
   // 多参数
   // cli demo [message...] xxx xxx
-  arguments?: { [k: string]: IArguments };
+  arguments?: Record<string, IArguments>;
   // 必选
   // cli demo <base> xxx
   // 可选
@@ -44,22 +44,21 @@ interface CliCommandConfig {
   // cli demo <base>
   // 短名
   // cli demo <b> xxx
-  options?: { [k: string]: IOptions };
+  options?: Record<string, IOptions>;
   commands?: CliCommand[];
-  context?: () => { [k: string]: any };
-  helper?: { [k: string]: any };
-  // configs: { [k: string]: any };
+  context?: () => Record<string, any>;
+  helper?: Record<string, any>;
+  // configs: Record<string, any>;
   action?: (props: {
-    data: { [k: string]: any };
-    context: { [k: string]: any };
+    data: Record<string, any>;
+    context: Record<string, any>;
     logger: ReturnType<typeof createLogger>;
     helper: {
       runPrompt: ReturnType<typeof createPrompt>;
       runCron: ReturnType<typeof createRunCron>;
       runCmd: ReturnType<typeof createRunCmd>;
       runTask: ReturnType<typeof createRunTask>;
-      [k: string]: any;
-    };
+    } & Record<string, any>;
   }) => void;
 }
 
