@@ -156,6 +156,7 @@ export interface CliCoreConfig {
   commands?: CliCommand[];
   context?: () => Record<string, any>;
   helper?: Record<string, any>;
+  configs?: { interactive?: boolean };
 }
 
 export class CliCore {

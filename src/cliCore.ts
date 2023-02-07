@@ -19,7 +19,7 @@ interface CliCoreConfig {
   commands?: CliCommand[];
   context?: () => Record<string, any>;
   helper?: Record<string, any>;
-  // configs: Record<string, any>;
+  configs?: { interactive?: boolean };
 }
 
 export default class CliCore {
@@ -72,13 +72,14 @@ export default class CliCore {
       commands: config.commands || [],
       context: config.context || (() => ({})),
       helper: config.helper || {},
+      configs: { interactive: false, ...(config.configs || {}) },
     };
   }
 
   private createInteractive() {
-    return createOption("-i, --interactive", "开启交互式命令行").default(
-      false,
-      "默认不开启",
+    return createOption("-i, --interactive", "交互式命令行").default(
+      this.baseConfig.configs.interactive,
+      String(this.baseConfig.configs.interactive),
     );
   }
 
@@ -112,45 +113,36 @@ export default class CliCore {
               const defaultAnswers: Record<string, any> = {};
 
               const createItem = (key: string, item: IBaseParams) => {
+                const setDefault = (d: any) =>
+                  item.default
+                    ? Array.isArray(item.default)
+                      ? (item.default[0] as any)
+                      : (item.default as any)
+                    : d;
+
                 if (utils.isCheckbox(item)) {
                   prompt.addCheckbox({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
-                    default: item.default
-                      ? Array.isArray(item.default)
-                        ? (item.default[0] as any)
-                        : (item.default as any)
-                      : [],
+                    default: setDefault([]),
                   });
                 } else if (utils.isList(item)) {
                   prompt.addList({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
-                    default: item.default
-                      ? Array.isArray(item.default)
-                        ? (item.default[0] as any)
-                        : (item.default as any)
-                      : "",
+                    default: setDefault(""),
                   });
                 } else if (utils.isInput(item)) {
                   prompt.addInput({
                     name: key,
                     message: item.description,
-                    default: item.default
-                      ? Array.isArray(item.default)
-                        ? (item.default[0] as any)
-                        : (item.default as any)
-                      : "",
+                    default: setDefault(""),
                   });
                   // optional: true
                 } else {
-                  defaultAnswers[key] = item.default
-                    ? Array.isArray(item.default)
-                      ? (item.default[0] as any)
-                      : (item.default as any)
-                    : "";
+                  defaultAnswers[key] = setDefault("");
                 }
               };
 
