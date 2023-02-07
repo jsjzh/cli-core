@@ -109,34 +109,48 @@ export default class CliCore {
             } else {
               const prompt = this.helper.runPrompt();
 
-              // default
+              const defaultAnswers: Record<string, any> = {};
+
               const createItem = (key: string, item: IBaseParams) => {
                 if (utils.isCheckbox(item)) {
                   prompt.addCheckbox({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
-                    default: Array.isArray(item.default)
-                      ? (item.default[0] as any)
-                      : (item.default as any),
+                    default: item.default
+                      ? Array.isArray(item.default)
+                        ? (item.default[0] as any)
+                        : (item.default as any)
+                      : [],
                   });
                 } else if (utils.isList(item)) {
                   prompt.addList({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
-                    default: Array.isArray(item.default)
-                      ? (item.default[0] as any)
-                      : (item.default as any),
+                    default: item.default
+                      ? Array.isArray(item.default)
+                        ? (item.default[0] as any)
+                        : (item.default as any)
+                      : "",
                   });
                 } else if (utils.isInput(item)) {
                   prompt.addInput({
                     name: key,
                     message: item.description,
-                    default: Array.isArray(item.default)
-                      ? (item.default[0] as any)
-                      : (item.default as any),
+                    default: item.default
+                      ? Array.isArray(item.default)
+                        ? (item.default[0] as any)
+                        : (item.default as any)
+                      : "",
                   });
+                  // optional: true
+                } else {
+                  defaultAnswers[key] = item.default
+                    ? Array.isArray(item.default)
+                      ? (item.default[0] as any)
+                      : (item.default as any)
+                    : "";
                 }
               };
 
@@ -150,7 +164,7 @@ export default class CliCore {
 
               prompt.execute((answers) => {
                 command.baseConfig.action({
-                  data: answers,
+                  data: { ...answers, ...defaultAnswers },
                   context: {
                     ...this.baseConfig.context(),
                     ...command.baseConfig.context(),
