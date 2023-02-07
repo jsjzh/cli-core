@@ -6,25 +6,19 @@ import {
   createRunCmd,
   createRunCron,
   createRunTask,
+  utils,
 } from "./shared";
-import type { Command } from "commander";
 
-interface IBaseParams {
-  description: string;
-  default?: string | [string, string];
-  choices?: string[];
-  optional?: boolean;
-  multiple?: boolean;
-}
+import type { Command } from "commander";
 
 interface CliCoreConfig {
   name: string;
   version: string;
   description: string;
   commands?: CliCommand[];
-  context?: () => { [k: keyof any]: any };
-  helper?: { [k: keyof any]: any };
-  // configs: { [k: keyof any]: any };
+  context?: () => { [k: string]: any };
+  helper?: { [k: string]: any };
+  // configs: { [k: string]: any };
 }
 
 export default class CliCore {
@@ -36,13 +30,13 @@ export default class CliCore {
     runCmd: ReturnType<typeof createRunCmd>;
     runCron: ReturnType<typeof createRunCron>;
     runTask: ReturnType<typeof createRunTask>;
-    [k: keyof any]: any;
+    [k: string]: any;
   };
 
   constructor(config: CliCoreConfig) {
     this.baseConfig = this.normalizeConfig(config);
 
-    this.program = this.initProgram();
+    this.program = this.createProgram();
 
     const logger = createLogger({ appName: this.baseConfig.name });
 
@@ -55,18 +49,22 @@ export default class CliCore {
       runTask: createRunTask(logger),
     };
 
-    this.registerInteractive();
-    this.registerAction();
+    const option = this.createInteractive();
+    const action = this.createAction();
+
+    this.program.addOption(option);
+    this.program.action(action);
+
     this.registerCliCommand();
   }
 
-  initProgram() {
+  private createProgram() {
     return createCommand(this.baseConfig.name)
       .version(this.baseConfig.version)
       .description(this.baseConfig.description);
   }
 
-  normalizeConfig(config: CliCoreConfig): Required<CliCoreConfig> {
+  private normalizeConfig(config: CliCoreConfig): Required<CliCoreConfig> {
     return {
       name: config.name,
       version: config.version,
@@ -77,27 +75,28 @@ export default class CliCore {
     };
   }
 
-  registerInteractive() {
-    const option = createOption("-i, --interactive", "开启交互式命令行");
-    option.default(false, "不开启");
-    this.program.addOption(option);
+  private createInteractive() {
+    return createOption("-i, --interactive", "开启交互式命令行").default(
+      false,
+      "不开启",
+    );
   }
 
-  registerAction() {
-    this.program.action((...args) => {
-      const instance: Command = args[args.length - 1];
-      const _args = args.slice(0, args.length - 2);
+  private createAction() {
+    return (...args: any[]) => {
+      // const instance: Command = args[args.length - 1];
+      // const _args = args.slice(0, args.length - 2);
       const _opts: { interactive: boolean } = args[args.length - 2];
 
       if (_opts.interactive) {
         const path: string[] = [];
 
-        const demo = (commands: CliCommand[]) => {
+        const createPrompt = (commands: CliCommand[]) => {
           const prompt = this.helper.runPrompt();
 
           prompt.addRawList({
             name: "command",
-            message: "请选择下一步执行任务",
+            message: "请选择下一个路径",
             choices: commands.map((command) => command.baseConfig.command),
           });
 
@@ -113,46 +112,26 @@ export default class CliCore {
               Array.isArray(command.baseConfig.commands) &&
               command.baseConfig.commands.length
             ) {
-              demo(command.baseConfig.commands);
+              createPrompt(command.baseConfig.commands);
             } else if (command) {
               const prompt = this.helper.runPrompt();
-
-              // TODO 还可以补充更多的类型
-              // InputQuestion,
-              //   NumberQuestion,
-              //   ConfirmQuestion,
-              // ListQuestion,
-              //   RawListQuestion,
-              // CheckboxQuestion,
-              //   PasswordQuestion,
-              //   EditorQuestion,
-
-              const isInput = (config: IBaseParams) => !config.optional;
-
-              const isList = (config: IBaseParams) =>
-                !config.optional && Array.isArray(config.choices);
-
-              const isCheckbox = (config: IBaseParams) =>
-                !config.optional &&
-                Array.isArray(config.choices) &&
-                config.multiple;
 
               Object.keys(command.baseConfig.arguments).forEach((key) => {
                 const item = command.baseConfig.arguments[key];
 
-                if (isCheckbox(item)) {
+                if (utils.isCheckbox(item)) {
                   prompt.addCheckbox({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
                   });
-                } else if (isList(item)) {
+                } else if (utils.isList(item)) {
                   prompt.addList({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
                   });
-                } else if (isInput(item)) {
+                } else if (utils.isInput(item)) {
                   prompt.addInput({
                     name: key,
                     message: item.description,
@@ -163,19 +142,19 @@ export default class CliCore {
               Object.keys(command.baseConfig.options).forEach((key) => {
                 const item = command.baseConfig.options[key];
 
-                if (isCheckbox(item)) {
+                if (utils.isCheckbox(item)) {
                   prompt.addCheckbox({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
                   });
-                } else if (isList(item)) {
+                } else if (utils.isList(item)) {
                   prompt.addList({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
                   });
-                } else if (isInput(item)) {
+                } else if (utils.isInput(item)) {
                   prompt.addInput({
                     name: key,
                     message: item.description,
@@ -198,20 +177,20 @@ export default class CliCore {
           });
         };
 
-        demo(this.baseConfig.commands);
+        createPrompt(this.baseConfig.commands);
       } else {
         this.program.outputHelp();
       }
-    });
+    };
   }
 
-  registerCliCommand() {
+  private registerCliCommand() {
     this.baseConfig.commands.forEach((command) =>
       this.program.addCommand(command.registerCommand(this)),
     );
   }
 
-  execute() {
+  public execute() {
     this.program.parse();
   }
 }

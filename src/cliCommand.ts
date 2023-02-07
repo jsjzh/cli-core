@@ -6,11 +6,11 @@ import {
   createRunCmd,
   createRunTask,
 } from "./shared";
-import { omit } from "lodash";
+
 import type { Command } from "commander";
 import type CliCore from "./cliCore";
 
-interface IBaseParams {
+export interface IBaseParams {
   description: string;
   default?: string | [string, string];
   choices?: string[];
@@ -27,36 +27,38 @@ interface IOptions extends IBaseParams {
 interface CliCommandConfig {
   command: string;
   description: string;
+  // 必选
   // cli demo <message> xxx
+  // 可选
   // cli demo [message] xxx
+  // 多参数
+  // cli demo [message...] xxx xxx
   arguments?: { [k: string]: IArguments };
-  // 基础
+  // 必选
   // cli demo <base> xxx
+  // 可选
+  // cli demo [base] xxx
+  // 多参数
+  // cli demo [base...] xxx xxx
+  // 布尔
+  // cli demo <base>
   // 短名
   // cli demo <b> xxx
-  // boolean
-  // cli demo <base>
-  // 可选
-  // cli demo [base]
-  // 多参数
-  // cli demo [base...]
   options?: { [k: string]: IOptions };
   commands?: CliCommand[];
-  context?: () => { [k: keyof any]: any };
-  helper?: { [k: keyof any]: any };
-  // configs: { [k: keyof any]: any };
+  context?: () => { [k: string]: any };
+  helper?: { [k: string]: any };
+  // configs: { [k: string]: any };
   action?: (props: {
-    data: { [k: keyof any]: any };
-    // args: { [k: keyof any]: any };
-    // opts: { [k: keyof any]: any };
-    context: { [k: keyof any]: any };
+    data: { [k: string]: any };
+    context: { [k: string]: any };
     logger: ReturnType<typeof createLogger>;
     helper: {
       runPrompt: ReturnType<typeof createPrompt>;
       runCron: ReturnType<typeof createRunCron>;
       runCmd: ReturnType<typeof createRunCmd>;
       runTask: ReturnType<typeof createRunTask>;
-      [k: keyof any]: any;
+      [k: string]: any;
     };
   }) => void;
 }
@@ -67,12 +69,14 @@ export default class CliCommand {
 
   constructor(config: CliCommandConfig) {
     this.baseConfig = this.normalizeConfig(config);
-
-    this.childProgram = createCommand(this.baseConfig.command);
-    this.childProgram.description(this.baseConfig.description);
+    this.childProgram = createCommand(this.baseConfig.command).description(
+      this.baseConfig.description,
+    );
   }
 
-  normalizeConfig(config: CliCommandConfig): Required<CliCommandConfig> {
+  private normalizeConfig(
+    config: CliCommandConfig,
+  ): Required<CliCommandConfig> {
     return {
       command: config.command,
       description: config.description,
@@ -85,14 +89,19 @@ export default class CliCommand {
     };
   }
 
-  registerArguments() {
-    Object.keys(this.baseConfig.arguments).forEach((key) => {
+  private createArguments() {
+    return Object.keys(this.baseConfig.arguments).map((key) => {
       const item = this.baseConfig.arguments[key];
+
       const name = item.multiple ? `${key}...` : key;
       const cmd = item.optional ? `[${name}]` : `<${name}>`;
+
       const argument = createArgument(cmd, item.description);
 
-      Array.isArray(item.choices) && argument.choices(item.choices);
+      if (item.choices && Array.isArray(item.choices)) {
+        argument.choices(item.choices);
+      }
+
       if (item.default) {
         argument.default.apply(
           argument,
@@ -102,22 +111,26 @@ export default class CliCommand {
         );
       }
 
-      this.childProgram.addArgument(argument);
+      return argument;
     });
   }
 
-  registerOptions() {
-    Object.keys(this.baseConfig.options).forEach((key) => {
+  private createOptions() {
+    return Object.keys(this.baseConfig.options).map((key) => {
       const item = this.baseConfig.options[key];
+
       const name = item.multiple ? `${key}...` : key;
       const cmd = item.optional ? `[${name}]` : `<${name}>`;
+
       const currentCmd = item.alias
         ? `-${item.alias}, --${key} ${cmd}`
         : `--${key} ${cmd}`;
 
       const option = createOption(currentCmd, item.description);
 
-      Array.isArray(item.choices) && option.choices(item.choices);
+      if (item.choices && Array.isArray(item.choices)) {
+        option.choices(item.choices);
+      }
 
       if (item.default) {
         option.default.apply(
@@ -128,19 +141,13 @@ export default class CliCommand {
         );
       }
 
-      this.childProgram.addOption(option);
+      return option;
     });
   }
 
-  registerInteractive() {
-    const option = createOption("-i, --interactive", "开启交互式命令行");
-    option.default(false, "不开启");
-    this.childProgram.addOption(option);
-  }
-
-  registerAction(cliCore: CliCore) {
-    this.childProgram.action((...args) => {
-      const instance: Command = args[args.length - 1];
+  private createAction(cliCore: CliCore) {
+    return (...args: any[]) => {
+      // const instance: Command = args[args.length - 1];
       const _args = args.slice(0, args.length - 2);
       const _opts = args[args.length - 2];
 
@@ -149,7 +156,7 @@ export default class CliCommand {
         {},
       );
 
-      let currOpts = omit(_opts, "interactive");
+      let currOpts = _opts;
 
       this.baseConfig.action({
         data: { ...currArgs, ...currOpts },
@@ -160,99 +167,17 @@ export default class CliCommand {
         helper: { ...cliCore.helper, ...this.baseConfig.helper },
         logger: cliCore.helper.logger,
       });
-    });
+    };
   }
 
-  registerInteractiveAction(cliCore: CliCore) {
-    this.childProgram
-      .exitOverride((error) => {
-        const prompt = cliCore.helper.runPrompt();
+  public registerCommand(cliCore: CliCore) {
+    const args = this.createArguments();
+    const opts = this.createOptions();
+    const action = this.createAction(cliCore);
 
-        // TODO 还可以补充更多的类型
-        // InputQuestion,
-        //   NumberQuestion,
-        //   ConfirmQuestion,
-        // ListQuestion,
-        //   RawListQuestion,
-        // CheckboxQuestion,
-        //   PasswordQuestion,
-        //   EditorQuestion,
-
-        const isInput = (config: IBaseParams) => !config.optional;
-
-        const isList = (config: IBaseParams) =>
-          !config.optional && Array.isArray(config.choices);
-
-        const isCheckbox = (config: IBaseParams) =>
-          !config.optional && Array.isArray(config.choices) && config.multiple;
-
-        Object.keys(this.baseConfig.arguments).forEach((key) => {
-          const item = this.baseConfig.arguments[key];
-
-          if (isCheckbox(item)) {
-            prompt.addCheckbox({
-              name: key,
-              message: item.description,
-              choices: item.choices!,
-            });
-          } else if (isList(item)) {
-            prompt.addList({
-              name: key,
-              message: item.description,
-              choices: item.choices!,
-            });
-          } else if (isInput(item)) {
-            prompt.addInput({
-              name: key,
-              message: item.description,
-            });
-          }
-        });
-
-        Object.keys(this.baseConfig.options).forEach((key) => {
-          const item = this.baseConfig.options[key];
-
-          if (isCheckbox(item)) {
-            prompt.addCheckbox({
-              name: key,
-              message: item.description,
-              choices: item.choices!,
-            });
-          } else if (isList(item)) {
-            prompt.addList({
-              name: key,
-              message: item.description,
-              choices: item.choices!,
-            });
-          } else if (isInput(item)) {
-            prompt.addInput({
-              name: key,
-              message: item.description,
-            });
-          }
-        });
-
-        prompt.execute((answers) => {
-          this.baseConfig.action({
-            data: answers,
-            context: {
-              ...cliCore.baseConfig.context(),
-              ...this.baseConfig.context(),
-            },
-            helper: { ...cliCore.helper, ...this.baseConfig.helper },
-            logger: cliCore.helper.logger,
-          });
-        });
-      })
-      .configureOutput({ writeErr: (str) => "" });
-  }
-
-  registerCommand(cliCore: CliCore) {
-    this.registerArguments();
-    this.registerOptions();
-    this.registerInteractive();
-    this.registerAction(cliCore);
-    this.registerInteractiveAction(cliCore);
+    args.forEach((arg) => this.childProgram.addArgument(arg));
+    opts.forEach((arg) => this.childProgram.addOption(arg));
+    this.childProgram.action(action);
 
     this.baseConfig.commands.forEach((command) =>
       this.childProgram.addCommand(command.registerCommand(cliCore)),
