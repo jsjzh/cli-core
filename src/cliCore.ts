@@ -109,23 +109,33 @@ export default class CliCore {
             } else {
               const prompt = this.helper.runPrompt();
 
+              // default
               const createItem = (key: string, item: IBaseParams) => {
                 if (utils.isCheckbox(item)) {
                   prompt.addCheckbox({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
+                    default: Array.isArray(item.default)
+                      ? (item.default[0] as any)
+                      : (item.default as any),
                   });
                 } else if (utils.isList(item)) {
                   prompt.addList({
                     name: key,
                     message: item.description,
                     choices: item.choices!,
+                    default: Array.isArray(item.default)
+                      ? (item.default[0] as any)
+                      : (item.default as any),
                   });
                 } else if (utils.isInput(item)) {
                   prompt.addInput({
                     name: key,
                     message: item.description,
+                    default: Array.isArray(item.default)
+                      ? (item.default[0] as any)
+                      : (item.default as any),
                   });
                 }
               };

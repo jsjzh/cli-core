@@ -104,7 +104,7 @@ declare namespace Helper {
 
 interface IBaseParams {
   description: string;
-  default?: string | [string, string];
+  default?: any | [any, string];
   choices?: string[];
   optional?: boolean;
   multiple?: boolean;
