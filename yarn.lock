@@ -183,7 +183,7 @@
 
 "@types/cron@^2.0.0":
   version "2.0.0"
-  resolved "https://registry.npmmirror.com/@types/cron/-/cron-2.0.0.tgz#4fe75f2720a3b69a1f7b80e656749f4c2c96d727"
+  resolved "https://registry.yarnpkg.com/@types/cron/-/cron-2.0.0.tgz#4fe75f2720a3b69a1f7b80e656749f4c2c96d727"
   integrity sha512-xZM08fqvwIXgghtPVkSPKNgC+JoMQ2OHazEvyTKnNf7aWu1aB6/4lBbQFrb03Td2cUGG7ITzMv3mFYnMu6xRaQ==
   dependencies:
     "@types/luxon" "*"
@@ -191,7 +191,7 @@
 
 "@types/inquirer@^9.0.3":
   version "9.0.3"
-  resolved "https://registry.npmmirror.com/@types/inquirer/-/inquirer-9.0.3.tgz#dc99da4f2f6de9d26c284b4f6aaab4d98c456db1"
+  resolved "https://registry.yarnpkg.com/@types/inquirer/-/inquirer-9.0.3.tgz#dc99da4f2f6de9d26c284b4f6aaab4d98c456db1"
   integrity sha512-CzNkWqQftcmk2jaCWdBTf9Sm7xSw4rkI1zpU/Udw3HX5//adEZUIm9STtoRP1qgWj0CWQtJ9UTvqmO2NNjhMJw==
   dependencies:
     "@types/through" "*"
@@ -204,7 +204,7 @@
 
 "@types/lodash@^4.14.191":
   version "4.14.191"
-  resolved "https://registry.npmmirror.com/@types/lodash/-/lodash-4.14.191.tgz#09511e7f7cba275acd8b419ddac8da9a6a79e2fa"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.191.tgz#09511e7f7cba275acd8b419ddac8da9a6a79e2fa"
   integrity sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==
 
 "@types/luxon@*":
@@ -219,7 +219,7 @@
 
 "@types/node@^18.13.0":
   version "18.13.0"
-  resolved "https://registry.npmmirror.com/@types/node/-/node-18.13.0.tgz#0400d1e6ce87e9d3032c19eb6c58205b0d3f7850"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.13.0.tgz#0400d1e6ce87e9d3032c19eb6c58205b0d3f7850"
   integrity sha512-gC3TazRzGoOnoKAhUx+Q0t8S9Tzs74z7m0ipwGpSqQrleP14hKxP4/JUeEQcD3W1/aIpnWl8pHowI7WokuZpXg==
 
 "@types/semver@^7.3.12":
@@ -236,7 +236,7 @@
 
 "@typescript-eslint/eslint-plugin@^5.51.0":
   version "5.51.0"
-  resolved "https://registry.npmmirror.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-5.51.0.tgz#da3f2819633061ced84bb82c53bba45a6fe9963a"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-5.51.0.tgz#da3f2819633061ced84bb82c53bba45a6fe9963a"
   integrity sha512-wcAwhEWm1RgNd7dxD/o+nnLW8oH+6RK1OGnmbmkj/GGoDPV1WWMVP0FXYQBivKHdwM1pwii3bt//RC62EriIUQ==
   dependencies:
     "@typescript-eslint/scope-manager" "5.51.0"
@@ -252,7 +252,7 @@
 
 "@typescript-eslint/parser@^5.51.0":
   version "5.51.0"
-  resolved "https://registry.npmmirror.com/@typescript-eslint/parser/-/parser-5.51.0.tgz#2d74626652096d966ef107f44b9479f02f51f271"
+  resolved "https://registry.yarnpkg.com/@typescript-eslint/parser/-/parser-5.51.0.tgz#2d74626652096d966ef107f44b9479f02f51f271"
   integrity sha512-fEV0R9gGmfpDeRzJXn+fGQKcl0inIeYobmmUWijZh9zA7bxJ8clPhV9up2ZQzATxAiFAECqPQyMDB4o4B81AaA==
   dependencies:
     "@typescript-eslint/scope-manager" "5.51.0"
@@ -519,7 +519,7 @@ colorspace@1.1.x:
 
 commander@^10.0.0:
   version "10.0.0"
-  resolved "https://registry.npmmirror.com/commander/-/commander-10.0.0.tgz#71797971162cd3cf65f0b9d24eb28f8d303acdf1"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-10.0.0.tgz#71797971162cd3cf65f0b9d24eb28f8d303acdf1"
   integrity sha512-zS5PnTI22FIRM6ylNW8G4Ap0IEOyk62fhLSD0+uHRT9McRCLGpkVNvao4bjimpK/GShynyQkFFxHhwMcETmduA==
 
 concat-map@0.0.1:
@@ -529,7 +529,7 @@ concat-map@0.0.1:
 
 cron@^2.2.0:
   version "2.2.0"
-  resolved "https://registry.npmmirror.com/cron/-/cron-2.2.0.tgz#605ae5048e9715a22db12e9fe2563a92740b9fed"
+  resolved "https://registry.yarnpkg.com/cron/-/cron-2.2.0.tgz#605ae5048e9715a22db12e9fe2563a92740b9fed"
   integrity sha512-GPiI3OgMv83XRtEUc2gUdaLvJhO3XbLN288layOBkDTupg0RK5IECNGpkykIMHg+muVR2bxt29b0xvCAcBrjYQ==
   dependencies:
     luxon "^3.2.1"
@@ -593,7 +593,7 @@ enabled@2.0.x:
 
 esbuild@^0.17.6:
   version "0.17.6"
-  resolved "https://registry.npmmirror.com/esbuild/-/esbuild-0.17.6.tgz#bbccd4433629deb6e0a83860b3b61da120ba4e01"
+  resolved "https://registry.yarnpkg.com/esbuild/-/esbuild-0.17.6.tgz#bbccd4433629deb6e0a83860b3b61da120ba4e01"
   integrity sha512-TKFRp9TxrJDdRWfSsSERKEovm6v30iHnrjlcGhLBOtReE28Yp1VSBRfO3GTaOFMoxsNerx4TjrhzSuma9ha83Q==
   optionalDependencies:
     "@esbuild/android-arm" "0.17.6"
@@ -631,7 +631,7 @@ escape-string-regexp@^5.0.0:
 
 eslint-config-alloy@^4.9.0:
   version "4.9.0"
-  resolved "https://registry.npmmirror.com/eslint-config-alloy/-/eslint-config-alloy-4.9.0.tgz#44ed777e8eb0ee595baabeb5d6cb568c2e6461c2"
+  resolved "https://registry.yarnpkg.com/eslint-config-alloy/-/eslint-config-alloy-4.9.0.tgz#44ed777e8eb0ee595baabeb5d6cb568c2e6461c2"
   integrity sha512-4DfiN0sXByf5WuXioZrrZJdfzZw+lgdoQfFTuQyFenJ2XeIKrsXYctArLiZAoAsTxyZnmUFYqrgwUIXx26q0gg==
 
 eslint-scope@^5.1.1:
@@ -669,7 +669,7 @@ eslint-visitor-keys@^3.3.0:
 
 eslint@^8.33.0:
   version "8.33.0"
-  resolved "https://registry.npmmirror.com/eslint/-/eslint-8.33.0.tgz#02f110f32998cb598c6461f24f4d306e41ca33d7"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.33.0.tgz#02f110f32998cb598c6461f24f4d306e41ca33d7"
   integrity sha512-WjOpFQgKK8VrCnAtl8We0SUOy/oVZ5NHykyMiagV1M9r8IFpIJX7DduK6n1mpfhlG7T1NLWm2SuD8QB7KFySaA==
   dependencies:
     "@eslint/eslintrc" "^1.4.1"
@@ -957,7 +957,7 @@ inherits@2, inherits@^2.0.3, inherits@^2.0.4:
 
 inquirer@^9.1.4:
   version "9.1.4"
-  resolved "https://registry.npmmirror.com/inquirer/-/inquirer-9.1.4.tgz#482da8803670a64bd942bc5166a9547a19d41474"
+  resolved "https://registry.yarnpkg.com/inquirer/-/inquirer-9.1.4.tgz#482da8803670a64bd942bc5166a9547a19d41474"
   integrity sha512-9hiJxE5gkK/cM2d1mTEnuurGTAoHebbkX0BYl3h7iEg7FYfuNIom+nDfBCSWtvSnoSrWCeBxqqBZu26xdlJlXA==
   dependencies:
     ansi-escapes "^6.0.0"
@@ -1072,7 +1072,7 @@ lodash.merge@^4.6.2:
 
 lodash@^4.17.21:
   version "4.17.21"
-  resolved "https://registry.npmmirror.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 log-symbols@^5.1.0:
@@ -1506,7 +1506,7 @@ type-fest@^3.0.0:
 
 typescript@^4.9.5:
   version "4.9.5"
-  resolved "https://registry.npmmirror.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
   integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
 uri-js@^4.2.2:
@@ -1537,7 +1537,7 @@ which@^2.0.1:
 
 winston-daily-rotate-file@^4.7.1:
   version "4.7.1"
-  resolved "https://registry.npmmirror.com/winston-daily-rotate-file/-/winston-daily-rotate-file-4.7.1.tgz#f60a643af87f8867f23170d8cd87dbe3603a625f"
+  resolved "https://registry.yarnpkg.com/winston-daily-rotate-file/-/winston-daily-rotate-file-4.7.1.tgz#f60a643af87f8867f23170d8cd87dbe3603a625f"
   integrity sha512-7LGPiYGBPNyGHLn9z33i96zx/bd71pjBn9tqQzO3I4Tayv94WPmBNwKC7CO1wPHdP9uvu+Md/1nr6VSH9h0iaA==
   dependencies:
     file-stream-rotator "^0.6.1"
@@ -1556,7 +1556,7 @@ winston-transport@^4.4.0, winston-transport@^4.5.0:
 
 winston@^3.8.2:
   version "3.8.2"
-  resolved "https://registry.npmmirror.com/winston/-/winston-3.8.2.tgz#56e16b34022eb4cff2638196d9646d7430fdad50"
+  resolved "https://registry.yarnpkg.com/winston/-/winston-3.8.2.tgz#56e16b34022eb4cff2638196d9646d7430fdad50"
   integrity sha512-MsE1gRx1m5jdTTO9Ld/vND4krP2To+lgDoMEHGGa4HIlAUyXJtfc7CxQcGXVyz2IBpw5hbFkj2b/AtUdQwyRew==
   dependencies:
     "@colors/colors" "1.5.0"
