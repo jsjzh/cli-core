@@ -10,14 +10,13 @@ import {
 } from "./shared";
 
 import type { Command } from "commander";
-import { isHaveLenArray } from "./shared/utils";
+import { haveLenArray } from "./shared/utils";
 
 interface CliCoreConfig {
   name: string;
   version: string;
   description: string;
   commands?: CliCommand[];
-  context?: () => Record<string, any>;
   helper?: Record<string, any>;
   configs?: { interactive?: boolean };
 }
@@ -70,7 +69,6 @@ export default class CliCore {
       version: config.version,
       description: config.description,
       commands: config.commands || [],
-      context: config.context || (() => ({})),
       helper: config.helper || {},
       configs: { interactive: false, ...(config.configs || {}) },
     };
@@ -105,7 +103,7 @@ export default class CliCore {
           prompt.execute((answers) => {
             const command = answers["command"];
 
-            if (isHaveLenArray(command.baseConfig.commands)) {
+            if (haveLenArray(command.baseConfig.commands)) {
               createPrompt(command.baseConfig.commands);
             } else {
               const prompt = this.helper.runPrompt();
@@ -156,11 +154,7 @@ export default class CliCore {
 
               prompt.execute((answers) => {
                 command.baseConfig.action({
-                  data: { ...answers, ...defaultAnswers },
-                  context: {
-                    ...this.baseConfig.context(),
-                    ...command.baseConfig.context(),
-                  },
+                  data: { ...defaultAnswers, ...answers },
                   helper: { ...this.helper, ...command.baseConfig.helper },
                   logger: this.helper.logger,
                 });

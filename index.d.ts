@@ -120,11 +120,9 @@ export interface CliCommandConfig<IArgs, IOpts> {
   arguments?: Record<keyof IArgs, IArguments>;
   options?: Record<keyof IOpts, IOptions>;
   commands?: CliCommand[];
-  context?: () => Record<string, any>;
   helper?: Record<string, any>;
   action?: (props: {
     data: Partial<Record<keyof IArgs | keyof IOpts, any>>;
-    context: Record<string, any>;
     logger: ReturnType<typeof Helper.createLogger>;
     helper: {
       runPrompt: ReturnType<typeof Helper.createPrompt>;
@@ -154,7 +152,6 @@ export interface CliCoreConfig {
   version: string;
   description: string;
   commands?: CliCommand[];
-  context?: () => Record<string, any>;
   helper?: Record<string, any>;
   configs?: { interactive?: boolean };
 }

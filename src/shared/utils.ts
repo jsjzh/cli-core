@@ -20,5 +20,5 @@ export const isList = (config: IBaseParams) =>
 export const isCheckbox = (config: IBaseParams) =>
   !config.optional && Array.isArray(config.choices) && config.multiple;
 
-export const isHaveLenArray = (arr: any) =>
+export const haveLenArray = (arr: any) =>
   Array.isArray(arr) && arr.length > 0 ? true : false;

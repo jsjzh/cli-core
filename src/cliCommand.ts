@@ -46,12 +46,10 @@ interface CliCommandConfig {
   // cli demo <b> xxx
   options?: Record<string, IOptions>;
   commands?: CliCommand[];
-  context?: () => Record<string, any>;
   helper?: Record<string, any>;
   // configs: Record<string, any>;
   action?: (props: {
     data: Record<string, any>;
-    context: Record<string, any>;
     logger: ReturnType<typeof createLogger>;
     helper: {
       runPrompt: ReturnType<typeof createPrompt>;
@@ -82,7 +80,6 @@ export default class CliCommand {
       arguments: config.arguments || {},
       options: config.options || {},
       commands: config.commands || [],
-      context: config.context || (() => ({})),
       helper: config.helper || {},
       action: config.action || (() => {}),
     };
@@ -159,10 +156,6 @@ export default class CliCommand {
 
       this.baseConfig.action({
         data: { ...currArgs, ...currOpts },
-        context: {
-          ...cliCore.baseConfig.context(),
-          ...this.baseConfig.context(),
-        },
         helper: { ...cliCore.helper, ...this.baseConfig.helper },
         logger: cliCore.helper.logger,
       });
