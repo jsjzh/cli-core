@@ -84,7 +84,7 @@ export class Prompt {
   addList(listConfig: {
     name: string;
     message: string;
-    choices: ({ name: string; value: string } | string)[];
+    choices: ({ name: string; value: any } | string)[];
     default?: string;
   }) {
     const listQuestion: ListQuestion = {
@@ -104,7 +104,7 @@ export class Prompt {
   addRawList(rawlistConfig: {
     name: string;
     message: string;
-    choices: ({ name: string; value: string } | string)[];
+    choices: ({ name: string; value: any } | string)[];
     default?: string;
   }) {
     const rawListQuestion: RawListQuestion = {
@@ -126,7 +126,7 @@ export class Prompt {
   addCheckbox(checkboxConfig: {
     name: string;
     message: string;
-    choices: ({ name: string; value: string } | string)[];
+    choices: ({ name: string; value: any } | string)[];
     default?: string[];
   }) {
     const checkboxQuestion: CheckboxQuestion = {

@@ -1,14 +1,16 @@
 import type { IBaseParams } from "@/cliCommand";
 
-// TODO 还可以补充更多的类型
+// DONE
 // InputQuestion,
-//   NumberQuestion,
-//   ConfirmQuestion,
 // ListQuestion,
-//   RawListQuestion,
 // CheckboxQuestion,
-//   PasswordQuestion,
-//   EditorQuestion,
+
+// TODO
+// NumberQuestion,
+// ConfirmQuestion,
+// RawListQuestion,
+// PasswordQuestion,
+// EditorQuestion,
 
 export const isInput = (config: IBaseParams) => !config.optional;
 
@@ -17,3 +19,6 @@ export const isList = (config: IBaseParams) =>
 
 export const isCheckbox = (config: IBaseParams) =>
   !config.optional && Array.isArray(config.choices) && config.multiple;
+
+export const isHaveLenArray = (arr: any) =>
+  Array.isArray(arr) && arr.length > 0 ? true : false;

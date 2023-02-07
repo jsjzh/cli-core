@@ -64,8 +64,8 @@ interface CliCommandConfig {
 }
 
 export default class CliCommand {
-  childProgram: Command;
-  baseConfig: Required<CliCommandConfig>;
+  public childProgram: Command;
+  public baseConfig: Required<CliCommandConfig>;
 
   constructor(config: CliCommandConfig) {
     this.baseConfig = this.normalizeConfig(config);
@@ -147,7 +147,7 @@ export default class CliCommand {
 
   private createAction(cliCore: CliCore) {
     return (...args: any[]) => {
-      // const instance: Command = args[args.length - 1];
+      const instance: Command = args[args.length - 1];
       const _args = args.slice(0, args.length - 2);
       const _opts = args[args.length - 2];
 

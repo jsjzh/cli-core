@@ -1,5 +1,5 @@
 import { createCommand, createOption } from "commander";
-import CliCommand from "./cliCommand";
+import CliCommand, { IBaseParams } from "./cliCommand";
 import {
   createLogger,
   createPrompt,
@@ -10,6 +10,7 @@ import {
 } from "./shared";
 
 import type { Command } from "commander";
+import { isHaveLenArray } from "./shared/utils";
 
 interface CliCoreConfig {
   name: string;
@@ -22,9 +23,9 @@ interface CliCoreConfig {
 }
 
 export default class CliCore {
-  program: Command;
-  baseConfig: Required<CliCoreConfig>;
-  helper: {
+  public program: Command;
+  public baseConfig: Required<CliCoreConfig>;
+  public helper: {
     logger: ReturnType<typeof createLogger>;
     runPrompt: ReturnType<typeof createPrompt>;
     runCmd: ReturnType<typeof createRunCmd>;
@@ -78,47 +79,38 @@ export default class CliCore {
   private createInteractive() {
     return createOption("-i, --interactive", "开启交互式命令行").default(
       false,
-      "不开启",
+      "默认不开启",
     );
   }
 
   private createAction() {
     return (...args: any[]) => {
-      // const instance: Command = args[args.length - 1];
-      // const _args = args.slice(0, args.length - 2);
+      const instance: Command = args[args.length - 1];
+      const _args = args.slice(0, args.length - 2);
       const _opts: { interactive: boolean } = args[args.length - 2];
 
       if (_opts.interactive) {
-        const path: string[] = [];
-
         const createPrompt = (commands: CliCommand[]) => {
           const prompt = this.helper.runPrompt();
 
           prompt.addRawList({
             name: "command",
-            message: "请选择下一个路径",
-            choices: commands.map((command) => command.baseConfig.command),
+            message: "please select the next command",
+            choices: commands.map((command) => ({
+              name: command.baseConfig.command,
+              value: command,
+            })),
           });
 
           prompt.execute((answers) => {
-            const name = answers["command"];
-            path.push(name);
-            const command = commands.find(
-              (command) => command.baseConfig.command === name,
-            );
+            const command = answers["command"];
 
-            if (
-              command &&
-              Array.isArray(command.baseConfig.commands) &&
-              command.baseConfig.commands.length
-            ) {
+            if (isHaveLenArray(command.baseConfig.commands)) {
               createPrompt(command.baseConfig.commands);
-            } else if (command) {
+            } else {
               const prompt = this.helper.runPrompt();
 
-              Object.keys(command.baseConfig.arguments).forEach((key) => {
-                const item = command.baseConfig.arguments[key];
-
+              const createItem = (key: string, item: IBaseParams) => {
                 if (utils.isCheckbox(item)) {
                   prompt.addCheckbox({
                     name: key,
@@ -137,30 +129,15 @@ export default class CliCore {
                     message: item.description,
                   });
                 }
-              });
+              };
 
-              Object.keys(command.baseConfig.options).forEach((key) => {
-                const item = command.baseConfig.options[key];
+              Object.keys(command.baseConfig.arguments).forEach((key) =>
+                createItem(key, command.baseConfig.arguments[key]),
+              );
 
-                if (utils.isCheckbox(item)) {
-                  prompt.addCheckbox({
-                    name: key,
-                    message: item.description,
-                    choices: item.choices!,
-                  });
-                } else if (utils.isList(item)) {
-                  prompt.addList({
-                    name: key,
-                    message: item.description,
-                    choices: item.choices!,
-                  });
-                } else if (utils.isInput(item)) {
-                  prompt.addInput({
-                    name: key,
-                    message: item.description,
-                  });
-                }
-              });
+              Object.keys(command.baseConfig.options).forEach((key) =>
+                createItem(key, command.baseConfig.options[key]),
+              );
 
               prompt.execute((answers) => {
                 command.baseConfig.action({
