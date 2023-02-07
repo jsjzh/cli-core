@@ -4,8 +4,6 @@ import type { Logger } from "winston";
 import type { StdioOptions } from "child_process";
 import type { PromptModule, Question, Answers } from "inquirer";
 
-// type AnyObject = { [k: keyof any]: any };
-
 declare namespace Helper {
   interface TaskItem {
     title: string;
@@ -19,13 +17,11 @@ declare namespace Helper {
     add(taskItem: TaskItem | TaskItem[]): this;
     run(): Promise<void>;
   }
-
   interface IPromptConfig {
     prefix?: string;
     suffix?: string;
     initialAnswers?: Partial<Answers>;
   }
-
   class Prompt {
     promptModule: PromptModule;
     prompts: Question[];
@@ -50,37 +46,19 @@ declare namespace Helper {
     addList(listConfig: {
       name: string;
       message: string;
-      choices: (
-        | {
-            name: string;
-            value: string;
-          }
-        | string
-      )[];
+      choices: ({ name: string; value: string } | string)[];
       default?: string;
     }): this;
     addRawList(rawlistConfig: {
       name: string;
       message: string;
-      choices: (
-        | {
-            name: string;
-            value: string;
-          }
-        | string
-      )[];
+      choices: ({ name: string; value: string } | string)[];
       default?: string;
     }): this;
     addCheckbox(checkboxConfig: {
       name: string;
       message: string;
-      choices: (
-        | {
-            name: string;
-            value: string;
-          }
-        | string
-      )[];
+      choices: ({ name: string; value: string } | string)[];
       default?: string[];
     }): this;
     addPassword(passwordConfig: {
@@ -95,7 +73,6 @@ declare namespace Helper {
     }): this;
     execute(callback?: (value: Answers) => void): Promise<void>;
   }
-
   const createPrompt: (
     config?: IPromptConfig,
   ) => (initialAnswers?: Partial<Answers>) => Prompt;
@@ -129,25 +106,31 @@ export interface CliCommandConfig {
   arguments?: { [k: string]: IArguments };
   options?: { [k: string]: IOptions };
   commands?: CliCommand[];
-  context?: () => { [k: keyof any]: any };
-  helper?: { [k: keyof any]: any };
+  context?: () => { [k: string]: any };
+  helper?: { [k: string]: any };
   action?: (props: {
-    data: { [k: keyof any]: any };
-    context: { [k: keyof any]: any };
+    data: { [k: string]: any };
+    context: { [k: string]: any };
     logger: ReturnType<typeof Helper.createLogger>;
     helper: {
       runPrompt: ReturnType<typeof Helper.createPrompt>;
       runCron: ReturnType<typeof Helper.createRunCron>;
       runCmd: ReturnType<typeof Helper.createRunCmd>;
       runTask: ReturnType<typeof Helper.createRunTask>;
-      [k: keyof any]: any;
+      [k: string]: any;
     };
-    instance: Command;
   }) => void;
 }
 
 export class CliCommand {
+  childProgram: Command;
+  baseConfig: Required<CliCommandConfig>;
   constructor(config: CliCommandConfig);
+  private normalizeConfig;
+  private createArguments;
+  private createOptions;
+  private createAction;
+  registerCommand(cliCore: CliCore): Command;
 }
 
 export interface CliCoreConfig {
@@ -155,19 +138,26 @@ export interface CliCoreConfig {
   version: string;
   description: string;
   commands?: CliCommand[];
-  context?: () => { [k: keyof any]: any };
-  helper?: { [k: keyof any]: any };
+  context?: () => { [k: string]: any };
+  helper?: { [k: string]: any };
 }
 
 export class CliCore {
+  program: Command;
+  baseConfig: Required<CliCoreConfig>;
   helper: {
     logger: ReturnType<typeof Helper.createLogger>;
     runPrompt: ReturnType<typeof Helper.createPrompt>;
     runCmd: ReturnType<typeof Helper.createRunCmd>;
     runCron: ReturnType<typeof Helper.createRunCron>;
     runTask: ReturnType<typeof Helper.createRunTask>;
-    [k: keyof any]: any;
+    [k: string]: any;
   };
   constructor(config: CliCoreConfig);
+  private createProgram;
+  private normalizeConfig;
+  private createInteractive;
+  private createAction;
+  private registerCliCommand;
   execute(): void;
 }
