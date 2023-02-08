@@ -66,6 +66,8 @@ interface IOptions extends IBaseParams {
     2. 第二，直接在 cli-core 的最外层，CliCore 层，接收 -i 参数，执行 cli -i 可以通过选择 npm git demo 的方式，一层层下去
 20. 类型转换还是有问题，无法通过 ts 的传入类型来强行修改值类型
 21. choices 和 default 允许传入 name value 的方式
+22. 比如我有 cli npm publish 的指令，其中会涉及到 git push，而我已经写过了 cli git push，那如何让 cli npm publish 可以复用 cli git push 的逻辑？
+23. 是否可以增加一个参数，memory，意思就是，该 option 或者 argument 参数会记忆上次的输入值
 
 ```ts
 // isPrompt: boolean

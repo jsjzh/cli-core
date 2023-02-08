@@ -352,3 +352,4 @@ await helper
 - [ ] 类型转换有问题，因为命令行解析的结果都是字符串，无法通过 ts 传入值来修改获取值
 - [ ] 后续 logger 可能可以支持自定义 winston transports
 - [ ] 添加更多的 inquirer 的输入类型支持
+- [ ] 命令运行时互相调用
