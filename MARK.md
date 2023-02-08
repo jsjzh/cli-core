@@ -1,8 +1,6 @@
-# cli-core
+# MARK
 
-## 说明
-
-TODO
+这里全部都是没有什么逻辑的随思随想，平时写代码的时候突然有想法了就会在这里记一条，**最终这些想法落地成了 CliCore 框架**。
 
 ```ts
 interface App {
@@ -68,6 +66,7 @@ interface IOptions extends IBaseParams {
 21. choices 和 default 允许传入 name value 的方式
 22. 比如我有 cli npm publish 的指令，其中会涉及到 git push，而我已经写过了 cli git push，那如何让 cli npm publish 可以复用 cli git push 的逻辑？
 23. 是否可以增加一个参数，memory，意思就是，该 option 或者 argument 参数会记忆上次的输入值
+24. 需要增加一个 cron 的使用说明，如何在后台运行
 
 ```ts
 // isPrompt: boolean
