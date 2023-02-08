@@ -122,7 +122,7 @@ export interface CliCommandConfig<IArgs, IOpts> {
   commands?: CliCommand[];
   helper?: Record<string, any>;
   action?: (props: {
-    data: Partial<Record<keyof IArgs | keyof IOpts, any>>;
+    data: Partial<IArgs & IOpts>;
     logger: ReturnType<typeof Helper.createLogger>;
     helper: {
       runPrompt: ReturnType<typeof Helper.createPrompt>;
