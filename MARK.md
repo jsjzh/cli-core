@@ -67,6 +67,7 @@ interface IOptions extends IBaseParams {
 22. 比如我有 cli npm publish 的指令，其中会涉及到 git push，而我已经写过了 cli git push，那如何让 cli npm publish 可以复用 cli git push 的逻辑？
 23. 是否可以增加一个参数，memory，意思就是，该 option 或者 argument 参数会记忆上次的输入值
 24. 需要增加一个 cron 的使用说明，如何在后台运行
+25. 如果添加了很多 command，需要有一个标识，不在 inquirer 中显示
 
 ```ts
 // isPrompt: boolean
