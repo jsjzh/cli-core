@@ -68,6 +68,7 @@ interface IOptions extends IBaseParams {
 23. 是否可以增加一个参数，memory，意思就是，该 option 或者 argument 参数会记忆上次的输入值
 24. 需要增加一个 cron 的使用说明，如何在后台运行
 25. 如果添加了很多 command，需要有一个标识，不在 inquirer 中显示
+26. 可选项是不是可以通过一个函数来返回，比如 git branch 获取来的东东
 
 ```ts
 // isPrompt: boolean
