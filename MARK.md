@@ -69,6 +69,7 @@ interface IOptions extends IBaseParams {
 24. 需要增加一个 cron 的使用说明，如何在后台运行
 25. 如果添加了很多 command，需要有一个标识，不在 inquirer 中显示
 26. 可选项是不是可以通过一个函数来返回，比如 git branch 获取来的东东
+27. Confirm 的 inquired 可以通过一个参数，然后框架主动传入 true false，然后判断 "true" "false"
 
 ```ts
 // isPrompt: boolean
