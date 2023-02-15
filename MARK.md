@@ -70,6 +70,8 @@ interface IOptions extends IBaseParams {
 25. 如果添加了很多 command，需要有一个标识，不在 inquirer 中显示
 26. 可选项是不是可以通过一个函数来返回，比如 git branch 获取来的东东
 27. Confirm 的 inquired 可以通过一个参数，然后框架主动传入 true false，然后判断 "true" "false"
+28. 是不是可以出一个，统计命令使用次数的功能
+29. props 里面要有一个 config，把一些 cli-core 的基础参数放进去
 
 ```ts
 // isPrompt: boolean
