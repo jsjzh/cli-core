@@ -72,6 +72,8 @@ interface IOptions extends IBaseParams {
 27. Confirm 的 inquired 可以通过一个参数，然后框架主动传入 true false，然后判断 "true" "false"
 28. 是不是可以出一个，统计命令使用次数的功能
 29. props 里面要有一个 config，把一些 cli-core 的基础参数放进去
+30. 是否可以添加一个 globalCache，意思就是程序结束之后，也能获取到这些数据，等于说在本机持久化了数据
+31. 如何获取到上一个 inquirer 的数据？比如，根据上一个选项的答案，下一个选项的类别也不同
 
 ```ts
 // isPrompt: boolean
