@@ -24,7 +24,7 @@
     "build:watch": "rm -rf ./lib && esbuild src/index.ts --bundle --watch --platform=node --target=node10 --color=true --alias:@=src --outfile=lib/index.js",
     "build:js": "rm -rf ./lib && node build/index.js",
     "build:typings": "rm -rf ./typings && npx tsc --project ./",
-    "build": "npm run build:typings && npm run build:code",
+    "build": "npm run build:typings && npm run build:js",
     "test": "node test/index.js"
   },
   "homepage": "https://github.com/jsjzh/cli-core#readme",

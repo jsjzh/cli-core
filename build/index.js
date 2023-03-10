@@ -12,4 +12,12 @@ esbuild.build({
   alias: {
     "@": path.resolve(process.cwd(), "src"),
   },
+  external: [
+    "commander",
+    "cron",
+    "inquirer",
+    "lodash",
+    "winston",
+    "winston-daily-rotate-file",
+  ],
 });
