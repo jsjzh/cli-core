@@ -6,18 +6,11 @@ esbuild.build({
   outfile: "lib/index.js",
   platform: "node",
   target: "node10",
+  format: "cjs",
   color: true,
   bundle: true,
   minify: true,
   alias: {
     "@": path.resolve(process.cwd(), "src"),
   },
-  external: [
-    "commander",
-    "cron",
-    "inquirer",
-    "lodash",
-    "winston",
-    "winston-daily-rotate-file",
-  ],
 });
