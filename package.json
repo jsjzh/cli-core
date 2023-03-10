@@ -23,9 +23,9 @@
   "scripts": {
     "build:code": "rm -rf ./lib && esbuild src/index.ts --bundle --minify --platform=node --target=node10 --color=true --alias:@=src --outfile=lib/index.js",
     "build:watch": "rm -rf ./lib && esbuild src/index.ts --bundle --watch --platform=node --target=node10 --color=true --alias:@=src --outfile=lib/index.js",
-    "build:js": "rm -rf ./lib && node build/index.js",
+    "build:script": "rm -rf ./lib && tsx build/index.ts",
     "build:typings": "rm -rf ./typings && npx tsc --project ./",
-    "build": "npm run build:typings && npm run build:js",
+    "build": "npm run build:typings && npm run build:script",
     "test": "node test/index.js"
   },
   "homepage": "https://github.com/jsjzh/cli-core#readme",
