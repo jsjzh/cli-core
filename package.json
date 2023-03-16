@@ -26,7 +26,9 @@
     "build:script": "rm -rf ./lib && tsx build/index.ts",
     "build:typings": "rm -rf ./typings && npx tsc --project ./",
     "build": "npm run build:typings && npm run build:script",
-    "test": "node test/index.js"
+    "test": "node test/index.js",
+    "format": "prettier --write --cache --parser typescript \"**/*.[tj]s?(x)\"",
+    "format:check": "prettier --check --cache --parser typescript \"**/*.[tj]s?(x)\""
   },
   "homepage": "https://github.com/jsjzh/cli-core#readme",
   "repository": {
