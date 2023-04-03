@@ -74,6 +74,7 @@ interface IOptions extends IBaseParams {
 29. props 里面要有一个 config，把一些 cli-core 的基础参数放进去
 30. 是否可以添加一个 globalCache，意思就是程序结束之后，也能获取到这些数据，等于说在本机持久化了数据
 31. 如何获取到上一个 inquirer 的数据？比如，根据上一个选项的答案，下一个选项的类别也不同
+32. 运行错误的时候，不要把代码错误都抛出来
 
 ```ts
 // isPrompt: boolean
