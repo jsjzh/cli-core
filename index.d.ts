@@ -117,60 +117,46 @@ interface IOptions extends IBaseParams {
 export interface CliCommandConfig<IArgs, IOpts> {
   command: string;
   description: string;
-  arguments?: Record<keyof IArgs, IArguments>;
-  options?: Record<keyof IOpts, IOptions>;
+  arguments?: Record<string, IArguments>;
+  options?: Record<string, IOptions>;
   commands?: CliCommand[];
-  helper?: Record<string, any>;
   action?: (props: {
     data: Partial<IArgs & IOpts>;
-    logger: ReturnType<typeof Helper.createLogger>;
-    helper: {
-      runPrompt: ReturnType<typeof Helper.createPrompt>;
-      runCron: ReturnType<typeof Helper.createRunCron>;
-      runCmd: ReturnType<typeof Helper.createRunCmd>;
-      runTask: ReturnType<typeof Helper.createRunTask>;
-    } & Record<string, any>;
+    logger: Helpers["logger"];
+    helper: Omit<Helpers, "logger">;
   }) => void;
 }
 
 export class CliCommand<
-  IArgs = Record<string, any>,
-  IOpts = Record<string, any>,
+  IArgs extends Record<string, any> = {},
+  IOpts extends Record<string, any> = {},
 > {
   childProgram: Command;
-  baseConfig: Required<CliCommandConfig>;
+  baseConfig: Required<CliCommandConfig<IArgs, IOpts>>;
   constructor(config: CliCommandConfig<IArgs, IOpts>);
-  private normalizeConfig;
-  private createArguments;
-  private createOptions;
-  private createAction;
   registerCommand(cliCore: CliCore): Command;
+}
+
+interface Helpers {
+  logger: ReturnType<typeof Helper.createLogger>;
+  runPrompt: ReturnType<typeof Helper.createPrompt>;
+  runCmd: ReturnType<typeof Helper.createRunCmd>;
+  runCron: ReturnType<typeof Helper.createRunCron>;
+  runTask: ReturnType<typeof Helper.createRunTask>;
 }
 
 export interface CliCoreConfig {
   name: string;
   version: string;
-  description: string;
+  description?: string;
   commands?: CliCommand[];
-  helper?: Record<string, any>;
   configs?: { interactive?: boolean };
 }
 
-export class CliCore {
+export default class CliCore {
   program: Command;
   baseConfig: Required<CliCoreConfig>;
-  helper: {
-    logger: ReturnType<typeof Helper.createLogger>;
-    runPrompt: ReturnType<typeof Helper.createPrompt>;
-    runCmd: ReturnType<typeof Helper.createRunCmd>;
-    runCron: ReturnType<typeof Helper.createRunCron>;
-    runTask: ReturnType<typeof Helper.createRunTask>;
-  } & Record<string, any>;
+  helper: Helpers;
   constructor(config: CliCoreConfig);
-  private createProgram;
-  private normalizeConfig;
-  private createInteractive;
-  private createAction;
-  private registerCliCommand;
   execute(): void;
 }
