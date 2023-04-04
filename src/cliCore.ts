@@ -90,7 +90,7 @@ export default class CliCore {
       const _opts: { interactive: boolean } = args[args.length - 2];
 
       if (_opts.interactive) {
-        const createPrompt = (commands: CliCommand[]) => {
+        const createCliCorePrompt = (commands: CliCommand[]) => {
           this.helper
             .runPrompt<{ command: CliCommand }>()
             .addRawList({
@@ -105,13 +105,13 @@ export default class CliCore {
               const command = answers.command;
 
               if (utils.haveLenArray(command.baseConfig.commands)) {
-                createPrompt(command.baseConfig.commands);
+                createCliCorePrompt(command.baseConfig.commands);
               } else {
                 const prompt = this.helper.runPrompt();
 
                 const defaultAnswers: Record<string, any> = {};
 
-                const createItem = (key: string, item: IBaseParams) => {
+                const createItem = (name: string, item: IBaseParams) => {
                   const setDefault = (d: any) =>
                     item.default
                       ? Array.isArray(item.default)
@@ -121,41 +121,41 @@ export default class CliCore {
 
                   if (utils.isCheckbox(item)) {
                     prompt.addCheckbox({
-                      name: key,
+                      name,
                       message: item.description,
                       choices: item.choices!,
                       default: setDefault([]),
                     });
                   } else if (utils.isList(item)) {
                     prompt.addList({
-                      name: key,
+                      name,
                       message: item.description,
                       choices: item.choices!,
                       default: setDefault(""),
                     });
                   } else if (utils.isInput(item)) {
                     prompt.addInput({
-                      name: key,
+                      name,
                       message: item.description,
                       default: setDefault(""),
                     });
                   } else {
-                    defaultAnswers[key] = setDefault("");
+                    defaultAnswers[name] = setDefault("");
                   }
                 };
 
-                Object.keys(command.baseConfig.arguments).forEach((key) =>
-                  createItem(key, command.baseConfig.arguments[key]),
+                Object.keys(command.baseConfig.arguments).forEach((name) =>
+                  createItem(name, command.baseConfig.arguments[name]),
                 );
 
-                Object.keys(command.baseConfig.options).forEach((key) =>
-                  createItem(key, command.baseConfig.options[key]),
+                Object.keys(command.baseConfig.options).forEach((name) =>
+                  createItem(name, command.baseConfig.options[name]),
                 );
 
                 prompt.execute((answers) => {
                   command.baseConfig.action({
                     data: { ...defaultAnswers, ...answers },
-                    helper: { ...this.helper, ...command.baseConfig.helper },
+                    helper: this.helper,
                     logger: this.helper.logger,
                   });
                 });
@@ -163,7 +163,7 @@ export default class CliCore {
             });
         };
 
-        createPrompt(this.baseConfig.commands);
+        createCliCorePrompt(this.baseConfig.commands);
       } else {
         this.program.outputHelp();
       }

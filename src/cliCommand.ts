@@ -1,14 +1,8 @@
 import { createCommand, createArgument, createOption } from "commander";
-import {
-  createLogger,
-  createPrompt,
-  createRunCron,
-  createRunCmd,
-  createRunTask,
-} from "./shared";
 
 import type { Command } from "commander";
 import type CliCore from "./cliCore";
+import type { Helpers } from "./cliCore";
 
 export interface IBaseParams {
   description: string;
@@ -24,7 +18,7 @@ interface IOptions extends IBaseParams {
   alias?: string;
 }
 
-interface CliCommandConfig {
+interface CliCommandConfig<IArgs, IOpts> {
   command: string;
   description: string;
   // 必选
@@ -46,25 +40,21 @@ interface CliCommandConfig {
   // cli demo <b> xxx
   options?: Record<string, IOptions>;
   commands?: CliCommand[];
-  helper?: Record<string, any>;
-  // configs: Record<string, any>;
   action?: (props: {
-    data: Record<string, any>;
-    logger: ReturnType<typeof createLogger>;
-    helper: {
-      runPrompt: ReturnType<typeof createPrompt>;
-      runCron: ReturnType<typeof createRunCron>;
-      runCmd: ReturnType<typeof createRunCmd>;
-      runTask: ReturnType<typeof createRunTask>;
-    } & Record<string, any>;
+    data: Partial<IArgs & IOpts>;
+    logger: Helpers["logger"];
+    helper: Omit<Helpers, "logger">;
   }) => void;
 }
 
-export default class CliCommand {
+export default class CliCommand<
+  IArgs extends Record<string, any> = {},
+  IOpts extends Record<string, any> = {},
+> {
   public childProgram: Command;
-  public baseConfig: Required<CliCommandConfig>;
+  public baseConfig: Required<CliCommandConfig<IArgs, IOpts>>;
 
-  constructor(config: CliCommandConfig) {
+  constructor(config: CliCommandConfig<IArgs, IOpts>) {
     this.baseConfig = this.normalizeConfig(config);
     this.childProgram = createCommand(this.baseConfig.command).description(
       this.baseConfig.description,
@@ -72,15 +62,14 @@ export default class CliCommand {
   }
 
   private normalizeConfig(
-    config: CliCommandConfig,
-  ): Required<CliCommandConfig> {
+    config: CliCommandConfig<IArgs, IOpts>,
+  ): Required<CliCommandConfig<IArgs, IOpts>> {
     return {
       command: config.command,
       description: config.description,
       arguments: config.arguments || {},
       options: config.options || {},
       commands: config.commands || [],
-      helper: config.helper || {},
       action: config.action || (() => {}),
     };
   }
@@ -156,7 +145,7 @@ export default class CliCommand {
 
       this.baseConfig.action({
         data: { ...currArgs, ...currOpts },
-        helper: { ...cliCore.helper, ...this.baseConfig.helper },
+        helper: cliCore.helper,
         logger: cliCore.helper.logger,
       });
     };
