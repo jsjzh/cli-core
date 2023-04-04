@@ -19,7 +19,7 @@ dependencies:
   inquirer:
     specifier: ^9.1.5
     version: 9.1.5
-  lodash:
+  lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
   winston:
@@ -30,9 +30,9 @@ dependencies:
     version: 4.7.1(winston@3.8.2)
 
 devDependencies:
-  '@types/lodash':
-    specifier: ^4.14.192
-    version: 4.14.192
+  '@types/lodash-es':
+    specifier: ^4.17.7
+    version: 4.17.7
   '@typescript-eslint/eslint-plugin':
     specifier: ^5.57.1
     version: 5.57.1(@typescript-eslint/parser@5.57.1)(eslint@8.37.0)(typescript@4.9.5)
@@ -369,6 +369,12 @@ packages:
 
   /@types/json-schema@7.0.11:
     resolution: {integrity: sha512-wOuvG1SN4Us4rez+tylwwwCV1psiNVOkJeM3AUWUNWg/jDQY2+HE/444y5gc+jBmRqASOm2Oeh5c1axHobwRKQ==}
+    dev: true
+
+  /@types/lodash-es@4.17.7:
+    resolution: {integrity: sha512-z0ptr6UI10VlU6l5MYhGwS4mC8DZyYer2mCoyysZtSF7p26zOX8UpbrV0YpNYLGS8K4PUFIyEr62IMFFjveSiQ==}
+    dependencies:
+      '@types/lodash': 4.14.192
     dev: true
 
   /@types/lodash@4.14.192:
@@ -1263,6 +1269,10 @@ packages:
     dependencies:
       p-locate: 5.0.0
     dev: true
+
+  /lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
 
   /lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}

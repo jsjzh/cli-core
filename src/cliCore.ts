@@ -10,43 +10,34 @@ import {
 } from "./shared";
 
 import type { Command } from "commander";
-import { haveLenArray } from "./shared/utils";
 
 interface CliCoreConfig {
   name: string;
   version: string;
-  description: string;
+  description?: string;
   commands?: CliCommand[];
-  helper?: Record<string, any>;
   configs?: { interactive?: boolean };
+}
+
+export interface Helpers {
+  logger: ReturnType<typeof createLogger>;
+  runPrompt: ReturnType<typeof createPrompt>;
+  runCmd: ReturnType<typeof createRunCmd>;
+  runCron: ReturnType<typeof createRunCron>;
+  runTask: ReturnType<typeof createRunTask>;
 }
 
 export default class CliCore {
   public program: Command;
   public baseConfig: Required<CliCoreConfig>;
-  public helper: {
-    logger: ReturnType<typeof createLogger>;
-    runPrompt: ReturnType<typeof createPrompt>;
-    runCmd: ReturnType<typeof createRunCmd>;
-    runCron: ReturnType<typeof createRunCron>;
-    runTask: ReturnType<typeof createRunTask>;
-  } & Record<string, any>;
+  public helper: Helpers;
 
   constructor(config: CliCoreConfig) {
     this.baseConfig = this.normalizeConfig(config);
 
+    this.helper = this.createHelper();
+
     this.program = this.createProgram();
-
-    const logger = createLogger({ appName: this.baseConfig.name });
-
-    this.helper = {
-      ...this.baseConfig.helper,
-      logger,
-      runPrompt: createPrompt({ prefix: this.baseConfig.name }),
-      runCmd: createRunCmd(logger),
-      runCron: createRunCron(logger),
-      runTask: createRunTask(logger),
-    };
 
     const option = this.createInteractive();
     const action = this.createAction();
@@ -57,25 +48,36 @@ export default class CliCore {
     this.registerCliCommand();
   }
 
+  private normalizeConfig(config: CliCoreConfig): Required<CliCoreConfig> {
+    return {
+      name: config.name,
+      version: config.version,
+      description: config.description || config.name,
+      commands: config.commands || [],
+      configs: { interactive: false, ...(config.configs || {}) },
+    };
+  }
+
   private createProgram() {
     return createCommand(this.baseConfig.name)
       .version(this.baseConfig.version)
       .description(this.baseConfig.description);
   }
 
-  private normalizeConfig(config: CliCoreConfig): Required<CliCoreConfig> {
+  private createHelper() {
+    const logger = createLogger({ appName: this.baseConfig.name });
+
     return {
-      name: config.name,
-      version: config.version,
-      description: config.description,
-      commands: config.commands || [],
-      helper: config.helper || {},
-      configs: { interactive: false, ...(config.configs || {}) },
+      logger,
+      runPrompt: createPrompt({ prefix: this.baseConfig.name }),
+      runCmd: createRunCmd(logger),
+      runCron: createRunCron(logger),
+      runTask: createRunTask(logger),
     };
   }
 
   private createInteractive() {
-    return createOption("-i, --interactive", "交互式命令行").default(
+    return createOption("-i, --interactive", "使用交互式命令行运行").default(
       this.baseConfig.configs.interactive,
       String(this.baseConfig.configs.interactive),
     );
@@ -89,78 +91,76 @@ export default class CliCore {
 
       if (_opts.interactive) {
         const createPrompt = (commands: CliCommand[]) => {
-          const prompt = this.helper.runPrompt();
+          this.helper
+            .runPrompt<{ command: CliCommand }>()
+            .addRawList({
+              name: "command",
+              message: "please select the next command",
+              choices: commands.map((command) => ({
+                name: command.baseConfig.command,
+                value: command,
+              })),
+            })
+            .execute((answers) => {
+              const command = answers.command;
 
-          prompt.addRawList({
-            name: "command",
-            message: "please select the next command",
-            choices: commands.map((command) => ({
-              name: command.baseConfig.command,
-              value: command,
-            })),
-          });
+              if (utils.haveLenArray(command.baseConfig.commands)) {
+                createPrompt(command.baseConfig.commands);
+              } else {
+                const prompt = this.helper.runPrompt();
 
-          prompt.execute((answers) => {
-            const command = answers["command"];
+                const defaultAnswers: Record<string, any> = {};
 
-            if (haveLenArray(command.baseConfig.commands)) {
-              createPrompt(command.baseConfig.commands);
-            } else {
-              const prompt = this.helper.runPrompt();
+                const createItem = (key: string, item: IBaseParams) => {
+                  const setDefault = (d: any) =>
+                    item.default
+                      ? Array.isArray(item.default)
+                        ? (item.default[0] as any)
+                        : (item.default as any)
+                      : d;
 
-              const defaultAnswers: Record<string, any> = {};
+                  if (utils.isCheckbox(item)) {
+                    prompt.addCheckbox({
+                      name: key,
+                      message: item.description,
+                      choices: item.choices!,
+                      default: setDefault([]),
+                    });
+                  } else if (utils.isList(item)) {
+                    prompt.addList({
+                      name: key,
+                      message: item.description,
+                      choices: item.choices!,
+                      default: setDefault(""),
+                    });
+                  } else if (utils.isInput(item)) {
+                    prompt.addInput({
+                      name: key,
+                      message: item.description,
+                      default: setDefault(""),
+                    });
+                  } else {
+                    defaultAnswers[key] = setDefault("");
+                  }
+                };
 
-              const createItem = (key: string, item: IBaseParams) => {
-                const setDefault = (d: any) =>
-                  item.default
-                    ? Array.isArray(item.default)
-                      ? (item.default[0] as any)
-                      : (item.default as any)
-                    : d;
+                Object.keys(command.baseConfig.arguments).forEach((key) =>
+                  createItem(key, command.baseConfig.arguments[key]),
+                );
 
-                if (utils.isCheckbox(item)) {
-                  prompt.addCheckbox({
-                    name: key,
-                    message: item.description,
-                    choices: item.choices!,
-                    default: setDefault([]),
+                Object.keys(command.baseConfig.options).forEach((key) =>
+                  createItem(key, command.baseConfig.options[key]),
+                );
+
+                prompt.execute((answers) => {
+                  command.baseConfig.action({
+                    data: { ...defaultAnswers, ...answers },
+                    helper: { ...this.helper, ...command.baseConfig.helper },
+                    logger: this.helper.logger,
                   });
-                } else if (utils.isList(item)) {
-                  prompt.addList({
-                    name: key,
-                    message: item.description,
-                    choices: item.choices!,
-                    default: setDefault(""),
-                  });
-                } else if (utils.isInput(item)) {
-                  prompt.addInput({
-                    name: key,
-                    message: item.description,
-                    default: setDefault(""),
-                  });
-                  // optional: true
-                } else {
-                  defaultAnswers[key] = setDefault("");
-                }
-              };
-
-              Object.keys(command.baseConfig.arguments).forEach((key) =>
-                createItem(key, command.baseConfig.arguments[key]),
-              );
-
-              Object.keys(command.baseConfig.options).forEach((key) =>
-                createItem(key, command.baseConfig.options[key]),
-              );
-
-              prompt.execute((answers) => {
-                command.baseConfig.action({
-                  data: { ...defaultAnswers, ...answers },
-                  helper: { ...this.helper, ...command.baseConfig.helper },
-                  logger: this.helper.logger,
                 });
-              });
-            }
-          });
+              }
+            });
         };
 
         createPrompt(this.baseConfig.commands);

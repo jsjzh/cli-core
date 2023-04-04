@@ -1,5 +1,4 @@
 import { createPromptModule } from "inquirer";
-import { omit } from "lodash";
 
 import type {
   PromptModule,
@@ -19,7 +18,6 @@ import type {
 interface IPromptConfig {
   prefix?: string;
   suffix?: string;
-  initialAnswers?: Partial<Answers>;
 }
 
 interface IBaseConfig {
@@ -55,16 +53,16 @@ interface IEditorConfig extends IBaseConfig {
   default?: string;
 }
 
-export class Prompt {
+export class Prompt<T extends Answers> {
   promptModule: PromptModule;
   prompts: Question[];
-  baseConfig: Omit<IPromptConfig, "initialAnswers">;
-  initialAnswers: Partial<Answers>;
+  baseConfig: IPromptConfig;
+  initialAnswers: Answers;
 
-  constructor(config: IPromptConfig) {
+  constructor(config: IPromptConfig & { initialAnswers: Answers }) {
     this.promptModule = createPromptModule();
-    this.baseConfig = omit(config, "initialAnswers");
-    this.initialAnswers = config.initialAnswers || {};
+    this.baseConfig = config;
+    this.initialAnswers = config.initialAnswers;
     this.prompts = [];
   }
 
@@ -140,6 +138,7 @@ export class Prompt {
     return this;
   }
 
+  // TODO
   // addExpand(expandConfig: {}) {}
 
   addCheckbox(checkboxConfig: ICheckboxConfig) {
@@ -187,11 +186,13 @@ export class Prompt {
     return this;
   }
 
-  execute(callback?: (value: Answers) => void) {
+  execute(callback?: (values: T) => void) {
+    // TODO
     // if (!this.__validate()) {}
-    return this.promptModule(this.prompts).then(callback);
+    return this.promptModule<T>(this.prompts).then(callback);
   }
 
+  // TODO
   // __validate() {
   //   const names = this.prompts.map((prompt) => prompt.name);
   //   return names.length === [...new Set(names)].length;
@@ -199,8 +200,8 @@ export class Prompt {
 }
 
 const createPrompt =
-  (config: IPromptConfig = {}) =>
-  (initialAnswers: Partial<Answers> = {}) =>
-    new Prompt({ ...config, initialAnswers });
+  (config?: IPromptConfig) =>
+  <T extends Answers>(initialAnswers?: T) =>
+    new Prompt<T>({ ...(config || {}), initialAnswers: initialAnswers || {} });
 
 export default createPrompt;

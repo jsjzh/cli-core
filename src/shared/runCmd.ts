@@ -1,5 +1,5 @@
-import { execSync } from "child_process";
-import type { StdioOptions } from "child_process";
+import { execSync } from "node:child_process";
+import type { StdioOptions } from "node:child_process";
 import type { Logger } from "winston";
 
 const createRunCmd =
@@ -13,7 +13,7 @@ const createRunCmd =
       return execSync(cmd, {
         cwd,
         stdio,
-        encoding: "utf-8",
+        encoding: "utf8",
       });
     } catch (error) {
       throw new Error(`在 ${cwd} 运行 ${cmd} 指令出错`);
