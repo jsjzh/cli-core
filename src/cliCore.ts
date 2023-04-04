@@ -2,12 +2,15 @@ import { createCommand, createOption } from "commander";
 import CliCommand, { IBaseParams } from "./cliCommand";
 import {
   createLogger,
+  // 可迁移
   createPrompt,
   createRunCmd,
+  // 可删
   createRunCron,
   createRunTask,
-  utils,
 } from "./shared";
+
+import * as utils from "./utils";
 
 import type { Command } from "commander";
 
