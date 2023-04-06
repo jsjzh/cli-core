@@ -13,11 +13,7 @@ export default class Task {
 
   constructor(config?: TaskConfig) {
     this.tasks = [];
-
-    this.config = {
-      showLog: false,
-      ...config,
-    };
+    this.config = { showLog: config?.showLog ?? true };
   }
 
   add(taskItem: TaskItem | TaskItem[]) {
