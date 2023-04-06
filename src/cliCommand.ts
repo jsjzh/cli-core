@@ -2,9 +2,10 @@ import { createCommand, createArgument, createOption } from "commander";
 
 import type CliCore from "./cliCore";
 import type { Command } from "commander";
-import type createLogger from "./utils/createLogger";
+import type createLogger from "./util/createLogger";
+import type createRunCmd from "./util/createRunCmd";
 
-export interface IBaseParams {
+export interface BaseParams {
   description: string;
   default?: string | [string, string];
   choices?: string[];
@@ -12,9 +13,9 @@ export interface IBaseParams {
   multiple?: boolean;
 }
 
-interface IArguments extends IBaseParams {}
+interface Arguments extends BaseParams {}
 
-interface IOptions extends IBaseParams {
+interface Options extends BaseParams {
   alias?: string;
 }
 
@@ -27,7 +28,7 @@ interface CliCommandConfig<IArgs, IOpts> {
   // cli demo [message] xxx
   // 多参数
   // cli demo [message...] xxx xxx
-  arguments?: Record<string, IArguments>;
+  arguments?: Record<string, Arguments>;
   // 必选
   // cli demo <base> xxx
   // 可选
@@ -38,11 +39,12 @@ interface CliCommandConfig<IArgs, IOpts> {
   // cli demo <base>
   // 短名
   // cli demo <b> xxx
-  options?: Record<string, IOptions>;
+  options?: Record<string, Options>;
   commands?: CliCommand[];
   action?: (props: {
     data: Partial<IArgs & IOpts>;
     logger: ReturnType<typeof createLogger>;
+    runCmd: ReturnType<typeof createRunCmd>;
   }) => void;
 }
 
@@ -145,6 +147,7 @@ export default class CliCommand<
       this.baseConfig.action({
         data: { ...currArgs, ...currOpts },
         logger: cliCore.logger,
+        runCmd: cliCore.runCmd,
       });
     };
   }

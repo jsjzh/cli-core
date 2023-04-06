@@ -1,4 +1,4 @@
-import type { IBaseParams } from "@/cliCommand";
+import type { BaseParams } from "@/cliCommand";
 
 // DONE
 // InputQuestion,
@@ -12,12 +12,12 @@ import type { IBaseParams } from "@/cliCommand";
 // PasswordQuestion,
 // EditorQuestion,
 
-export const isInput = (config: IBaseParams) => !config.optional;
+export const isInput = (config: BaseParams) => !config.optional;
 
-export const isList = (config: IBaseParams) =>
+export const isList = (config: BaseParams) =>
   !config.optional && Array.isArray(config.choices);
 
-export const isCheckbox = (config: IBaseParams) =>
+export const isCheckbox = (config: BaseParams) =>
   !config.optional && Array.isArray(config.choices) && config.multiple;
 
 export const haveLenArray = (arr: any) =>

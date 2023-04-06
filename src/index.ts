@@ -1,9 +1,8 @@
 import CliCore from "./cliCore";
 import CliCommand from "./cliCommand";
 
-import createPrompt from "./shared/createPrompt";
-import createCmd from "./shared/createCmd";
-import createCron from "./shared/createCron";
-import createTask from "./shared/createTask";
+import { createPrompt } from "./shared/prompt";
+import { createCron } from "./shared/cron";
+import { createTask } from "./shared/task";
 
-export { CliCore, CliCommand, createPrompt, createCmd, createCron, createTask };
+export { CliCore, CliCommand, createPrompt, createCron, createTask };

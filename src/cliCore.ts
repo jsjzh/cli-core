@@ -1,14 +1,15 @@
 import { createCommand, createOption } from "commander";
 import CliCommand from "./cliCommand";
 
-import createPrompt from "./shared/createPrompt";
-import createLogger from "./utils/createLogger";
+import { createPrompt } from "./shared/prompt";
 
-import * as utils from "./utils";
+import * as utils from "./util";
+import createLogger from "./util/createLogger";
+import createRunCmd from "./util/createRunCmd";
 
-import type { IBaseParams } from "./cliCommand";
+import type { BaseParams } from "./cliCommand";
 import type { Command } from "commander";
-import type { CreateLoggerConfig } from "./utils/createLogger";
+import type { CreateLoggerConfig } from "./util/createLogger";
 
 interface CliCoreConfig {
   name: string;
@@ -16,28 +17,24 @@ interface CliCoreConfig {
   description?: string;
   commands?: CliCommand[];
   config?: { interactive?: boolean };
-  loggerConfig?: Partial<CreateLoggerConfig>;
+  loggerConfig?: CreateLoggerConfig;
 }
 
 export default class CliCore {
   public program: Command;
   public baseConfig: Required<Omit<CliCoreConfig, "loggerConfig">>;
   public logger: ReturnType<typeof createLogger>;
+  public runCmd: ReturnType<typeof createRunCmd>;
 
   constructor(config: CliCoreConfig) {
     this.baseConfig = this.normalizeConfig(config);
 
     this.logger = createLogger({
-      base: process.env.HOME!,
       appName: this.baseConfig.name,
-      datePattern: "YYYY-MM-DD",
-      logName: "%DATE%.log",
-      maxSize: "20m",
-      maxFiles: "14d",
-      logLevel: "warn",
-      outputLevel: "info",
       ...(config.loggerConfig || {}),
     });
+
+    this.runCmd = createRunCmd(this.logger);
 
     this.program = this.createProgram();
 
@@ -81,9 +78,9 @@ export default class CliCore {
 
       if (_opts.interactive) {
         const createCliCorePrompt = (commands: CliCommand[]) => {
-          createPrompt({ prefix: this.baseConfig.name })<{
+          createPrompt<{
             command: CliCommand;
-          }>()
+          }>({ prefix: this.baseConfig.name })
             .addRawList({
               name: "command",
               message: "please select the next command",
@@ -98,13 +95,13 @@ export default class CliCore {
               if (utils.haveLenArray(command.baseConfig.commands)) {
                 createCliCorePrompt(command.baseConfig.commands);
               } else {
-                const prompt = createPrompt({
-                  prefix: this.baseConfig.name,
-                })();
-
                 const defaultAnswers: Record<string, any> = {};
 
-                const createItem = (name: string, item: IBaseParams) => {
+                const prompt = createPrompt({
+                  prefix: this.baseConfig.name,
+                });
+
+                const createItem = (name: string, item: BaseParams) => {
                   const setDefault = (d: any) =>
                     item.default
                       ? Array.isArray(item.default)
@@ -149,6 +146,7 @@ export default class CliCore {
                   command.baseConfig.action({
                     data: { ...defaultAnswers, ...answers },
                     logger: this.logger,
+                    runCmd: this.runCmd,
                   });
                 });
               }

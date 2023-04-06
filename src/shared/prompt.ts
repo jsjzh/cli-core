@@ -15,63 +15,71 @@ import type {
   EditorQuestion,
 } from "inquirer";
 
-interface IPromptConfig {
-  prefix?: string;
-  suffix?: string;
-}
-
-interface IBaseConfig {
+interface BaseConfig {
   name: string;
   message: string;
 }
 
-interface IInputConfig extends IBaseConfig {
+interface InputConfig extends BaseConfig {
   default?: string;
 }
-interface INumberConfig extends IBaseConfig {
+interface NumberConfig extends BaseConfig {
   default?: number;
 }
-interface IConfirmConfig extends IBaseConfig {
+interface ConfirmConfig extends BaseConfig {
   default?: boolean;
 }
-interface IListConfig extends IBaseConfig {
+interface ListConfig extends BaseConfig {
   choices: ({ name: string; value: any } | string)[];
   default?: string;
 }
-interface IRawListConfig extends IBaseConfig {
+interface RawListConfig extends BaseConfig {
   choices: ({ name: string; value: any } | string)[];
   default?: string;
 }
-interface ICheckboxConfig extends IBaseConfig {
+interface CheckboxConfig extends BaseConfig {
   choices: ({ name: string; value: any } | string)[];
   default?: string[];
 }
-interface IPasswordConfig extends IBaseConfig {
+interface PasswordConfig extends BaseConfig {
   default?: string;
 }
-interface IEditorConfig extends IBaseConfig {
+interface EditorConfig extends BaseConfig {
   default?: string;
 }
 
-export class Prompt<T extends Answers> {
+interface PromptConfig {
+  prefix?: string;
+  suffix?: string;
+  initialAnswers?: Answers;
+}
+
+export default class Prompt<T extends Answers> {
   promptModule: PromptModule;
+  baseConfig: Required<PromptConfig>;
   prompts: Question[];
-  baseConfig: IPromptConfig;
-  initialAnswers: Answers;
 
-  constructor(config: IPromptConfig & { initialAnswers: Answers }) {
+  constructor(config: PromptConfig) {
+    this.baseConfig = this.normalizeConfig(config);
     this.promptModule = createPromptModule();
-    this.baseConfig = config;
-    this.initialAnswers = config.initialAnswers;
     this.prompts = [];
   }
 
-  addInput(inputConfig: IInputConfig) {
+  private normalizeConfig(config: PromptConfig) {
+    return {
+      prefix: config.prefix || "",
+      suffix: config.suffix || "",
+      initialAnswers: config.initialAnswers || {},
+    };
+  }
+
+  addInput(inputConfig: InputConfig) {
     const inputQuestion: InputQuestion = {
       type: "input",
       name: inputConfig.name,
       message: inputConfig.message,
-      default: inputConfig.default || this.initialAnswers[inputConfig.name],
+      default:
+        inputConfig.default || this.baseConfig.initialAnswers[inputConfig.name],
       ...this.baseConfig,
     };
 
@@ -80,12 +88,14 @@ export class Prompt<T extends Answers> {
     return this;
   }
 
-  addNumber(numberConfig: INumberConfig) {
+  addNumber(numberConfig: NumberConfig) {
     const numberQuestion: NumberQuestion = {
       type: "number",
       name: numberConfig.name,
       message: numberConfig.message,
-      default: numberConfig.default || this.initialAnswers[numberConfig.name],
+      default:
+        numberConfig.default ||
+        this.baseConfig.initialAnswers[numberConfig.name],
       ...this.baseConfig,
     };
 
@@ -94,12 +104,14 @@ export class Prompt<T extends Answers> {
     return this;
   }
 
-  addConfirm(confirmConfig: IConfirmConfig) {
+  addConfirm(confirmConfig: ConfirmConfig) {
     const confirmQuestion: ConfirmQuestion = {
       type: "confirm",
       name: confirmConfig.name,
       message: confirmConfig.message,
-      default: confirmConfig.default || this.initialAnswers[confirmConfig.name],
+      default:
+        confirmConfig.default ||
+        this.baseConfig.initialAnswers[confirmConfig.name],
       ...this.baseConfig,
     };
 
@@ -108,13 +120,14 @@ export class Prompt<T extends Answers> {
     return this;
   }
 
-  addList(listConfig: IListConfig) {
+  addList(listConfig: ListConfig) {
     const listQuestion: ListQuestion = {
       type: "list",
       name: listConfig.name,
       message: listConfig.message,
       choices: listConfig.choices,
-      default: listConfig.default || this.initialAnswers[listConfig.name],
+      default:
+        listConfig.default || this.baseConfig.initialAnswers[listConfig.name],
       ...this.baseConfig,
     };
 
@@ -123,13 +136,15 @@ export class Prompt<T extends Answers> {
     return this;
   }
 
-  addRawList(rawListConfig: IRawListConfig) {
+  addRawList(rawListConfig: RawListConfig) {
     const rawListQuestion: RawListQuestion = {
       type: "rawlist",
       name: rawListConfig.name,
       message: rawListConfig.message,
       choices: rawListConfig.choices,
-      default: rawListConfig.default || this.initialAnswers[rawListConfig.name],
+      default:
+        rawListConfig.default ||
+        this.baseConfig.initialAnswers[rawListConfig.name],
       ...this.baseConfig,
     };
 
@@ -141,14 +156,15 @@ export class Prompt<T extends Answers> {
   // TODO
   // addExpand(expandConfig: {}) {}
 
-  addCheckbox(checkboxConfig: ICheckboxConfig) {
+  addCheckbox(checkboxConfig: CheckboxConfig) {
     const checkboxQuestion: CheckboxQuestion = {
       type: "checkbox",
       name: checkboxConfig.name,
       message: checkboxConfig.message,
       choices: checkboxConfig.choices,
       default:
-        checkboxConfig.default || this.initialAnswers[checkboxConfig.name],
+        checkboxConfig.default ||
+        this.baseConfig.initialAnswers[checkboxConfig.name],
       ...this.baseConfig,
     };
 
@@ -157,13 +173,14 @@ export class Prompt<T extends Answers> {
     return this;
   }
 
-  addPassword(passwordConfig: IPasswordConfig) {
+  addPassword(passwordConfig: PasswordConfig) {
     const passwordQuestion: PasswordQuestion = {
       type: "password",
       name: passwordConfig.name,
       message: passwordConfig.message,
       default:
-        passwordConfig.default || this.initialAnswers[passwordConfig.name],
+        passwordConfig.default ||
+        this.baseConfig.initialAnswers[passwordConfig.name],
       ...this.baseConfig,
     };
 
@@ -172,12 +189,14 @@ export class Prompt<T extends Answers> {
     return this;
   }
 
-  addEditor(editorConfig: IEditorConfig) {
+  addEditor(editorConfig: EditorConfig) {
     const editorQuestion: EditorQuestion = {
       type: "editor",
       name: editorConfig.name,
       message: editorConfig.message,
-      default: editorConfig.default || this.initialAnswers[editorConfig.name],
+      default:
+        editorConfig.default ||
+        this.baseConfig.initialAnswers[editorConfig.name],
       ...this.baseConfig,
     };
 
@@ -199,9 +218,5 @@ export class Prompt<T extends Answers> {
   // }
 }
 
-const createPrompt =
-  (config?: IPromptConfig) =>
-  <T extends Answers>(initialAnswers?: T) =>
-    new Prompt<T>({ ...(config || {}), initialAnswers: initialAnswers || {} });
-
-export default createPrompt;
+export const createPrompt = <T extends Answers>(config?: PromptConfig) =>
+  new Prompt<T>(config || {});
