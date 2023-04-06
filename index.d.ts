@@ -209,7 +209,7 @@ declare module "src/shared/task" {
   }
   export const createTask: (option: TaskConfig) => Task;
 }
-declare module "src/index" {
+declare module "@oishi/cli-core" {
   import CliCore from "src/cliCore";
   import CliCommand from "src/cliCommand";
   import { createPrompt } from "src/shared/prompt";
