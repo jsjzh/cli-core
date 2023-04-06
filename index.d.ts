@@ -1,41 +1,19 @@
-import type { CronJob, CronJobParameters } from "cron";
-import type { Command } from "commander";
-import type { Logger } from "winston";
-import type { StdioOptions } from "child_process";
-import type { PromptModule, Question, Answers } from "inquirer";
-
-declare namespace Helper {
-  interface TaskItem {
-    title: string;
-    task(): Promise<any>;
-  }
-  interface RunTaskConfig {
-    hasTip?: boolean;
-  }
-  class RunTask {
-    constructor(logger: Logger, config?: RunTaskConfig);
-    add(taskItem: TaskItem | TaskItem[]): this;
-    run(): Promise<void>;
-  }
-  interface IPromptConfig {
-    prefix?: string;
-    suffix?: string;
-    initialAnswers?: Partial<Answers>;
-  }
-  interface IBaseConfig {
+declare module "src/shared/prompt" {
+  import type { PromptModule, Question, Answers } from "inquirer";
+  interface BaseConfig {
     name: string;
     message: string;
   }
-  interface IInputConfig extends IBaseConfig {
+  interface InputConfig extends BaseConfig {
     default?: string;
   }
-  interface INumberConfig extends IBaseConfig {
+  interface NumberConfig extends BaseConfig {
     default?: number;
   }
-  interface IConfirmConfig extends IBaseConfig {
+  interface ConfirmConfig extends BaseConfig {
     default?: boolean;
   }
-  interface IListConfig extends IBaseConfig {
+  interface ListConfig extends BaseConfig {
     choices: (
       | {
           name: string;
@@ -45,7 +23,7 @@ declare namespace Helper {
     )[];
     default?: string;
   }
-  interface IRawListConfig extends IBaseConfig {
+  interface RawListConfig extends BaseConfig {
     choices: (
       | {
           name: string;
@@ -55,7 +33,7 @@ declare namespace Helper {
     )[];
     default?: string;
   }
-  interface ICheckboxConfig extends IBaseConfig {
+  interface CheckboxConfig extends BaseConfig {
     choices: (
       | {
           name: string;
@@ -65,98 +43,177 @@ declare namespace Helper {
     )[];
     default?: string[];
   }
-  interface IPasswordConfig extends IBaseConfig {
+  interface PasswordConfig extends BaseConfig {
     default?: string;
   }
-  interface IEditorConfig extends IBaseConfig {
+  interface EditorConfig extends BaseConfig {
     default?: string;
   }
-  class Prompt {
+  interface PromptConfig {
+    prefix?: string;
+    suffix?: string;
+    initialAnswers?: Answers;
+  }
+  export default class Prompt<T extends Answers> {
     promptModule: PromptModule;
+    baseConfig: Required<PromptConfig>;
     prompts: Question[];
-    baseConfig: Omit<IPromptConfig, "initialAnswers">;
-    initialAnswers: Partial<Answers>;
-    constructor(config: IPromptConfig);
-    addInput(inputConfig: IInputConfig): this;
-    addNumber(numberConfig: INumberConfig): this;
-    addConfirm(confirmConfig: IConfirmConfig): this;
-    addList(listConfig: IListConfig): this;
-    addRawList(rawListConfig: IRawListConfig): this;
-    addCheckbox(checkboxConfig: ICheckboxConfig): this;
-    addPassword(passwordConfig: IPasswordConfig): this;
-    addEditor(editorConfig: IEditorConfig): this;
-    execute(callback?: (value: Answers) => void): Promise<void>;
+    constructor(config: PromptConfig);
+    private normalizeConfig;
+    addInput(inputConfig: InputConfig): this;
+    addNumber(numberConfig: NumberConfig): this;
+    addConfirm(confirmConfig: ConfirmConfig): this;
+    addList(listConfig: ListConfig): this;
+    addRawList(rawListConfig: RawListConfig): this;
+    addCheckbox(checkboxConfig: CheckboxConfig): this;
+    addPassword(passwordConfig: PasswordConfig): this;
+    addEditor(editorConfig: EditorConfig): this;
+    execute(callback?: (values: T) => void): Promise<void>;
   }
-  const createPrompt: (
-    config?: IPromptConfig,
-  ) => (initialAnswers?: Partial<Answers>) => Prompt;
-  const createRunTask: (logger: Logger) => (option: RunTaskConfig) => RunTask;
-  const createRunCron: (
-    logger: Logger,
-  ) => (options: CronJobParameters) => CronJob;
+  export const createPrompt: <T extends Answers>(
+    config?: PromptConfig,
+  ) => Prompt<T>;
+}
+declare module "src/util/index" {
+  import type { BaseParams } from "src/cliCommand";
+  export const isInput: (config: BaseParams) => boolean;
+  export const isList: (config: BaseParams) => boolean;
+  export const isCheckbox: (config: BaseParams) => boolean | undefined;
+  export const haveLenArray: (arr: any) => boolean;
+}
+declare module "src/util/createLogger" {
+  import winston from "winston";
+  export type Level =
+    | "error"
+    | "warn"
+    | "info"
+    | "http"
+    | "verbose"
+    | "debug"
+    | "silly";
+  export interface CreateLoggerConfig {
+    appName: string;
+    base?: string;
+    datePattern?: string;
+    logName?: string;
+    maxSize?: string;
+    maxFiles?: string;
+    logLevel?: Level;
+    outputLevel?: Level;
+  }
+  const createLogger: (config: CreateLoggerConfig) => winston.Logger;
+  export default createLogger;
+}
+declare module "src/util/createRunCmd" {
+  import type { StdioOptions } from "node:child_process";
+  import type { Logger } from "winston";
   const createRunCmd: (
     logger: Logger,
   ) => (
     cwd?: string,
   ) => (cmd: string, stdio?: StdioOptions, showExecuteCmd?: boolean) => string;
-  const createLogger: (option: { appName: string }) => Logger;
+  export default createRunCmd;
 }
-
-interface IBaseParams {
-  description: string;
-  default?: any | [any, string];
-  choices?: string[];
-  optional?: boolean;
-  multiple?: boolean;
+declare module "src/cliCore" {
+  import CliCommand from "src/cliCommand";
+  import createLogger from "src/util/createLogger";
+  import createRunCmd from "src/util/createRunCmd";
+  import type { Command } from "commander";
+  import type { CreateLoggerConfig } from "src/util/createLogger";
+  interface CliCoreConfig {
+    name: string;
+    version: string;
+    description?: string;
+    commands?: CliCommand[];
+    config?: {
+      interactive?: boolean;
+    };
+    loggerConfig?: CreateLoggerConfig;
+  }
+  export default class CliCore {
+    program: Command;
+    baseConfig: Required<Omit<CliCoreConfig, "loggerConfig">>;
+    logger: ReturnType<typeof createLogger>;
+    runCmd: ReturnType<typeof createRunCmd>;
+    constructor(config: CliCoreConfig);
+    private normalizeConfig;
+    private createProgram;
+    private createInteractive;
+    private createAction;
+    private registerCliCommand;
+    execute(): void;
+  }
 }
-interface IArguments extends IBaseParams {}
-interface IOptions extends IBaseParams {
-  alias?: string;
+declare module "src/cliCommand" {
+  import type CliCore from "src/cliCore";
+  import type { Command } from "commander";
+  import type createLogger from "src/util/createLogger";
+  import type createRunCmd from "src/util/createRunCmd";
+  export interface BaseParams {
+    description: string;
+    default?: string | [string, string];
+    choices?: string[];
+    optional?: boolean;
+    multiple?: boolean;
+  }
+  interface Arguments extends BaseParams {}
+  interface Options extends BaseParams {
+    alias?: string;
+  }
+  interface CliCommandConfig<IArgs, IOpts> {
+    command: string;
+    description: string;
+    arguments?: Record<string, Arguments>;
+    options?: Record<string, Options>;
+    commands?: CliCommand[];
+    action?: (props: {
+      data: Partial<IArgs & IOpts>;
+      logger: ReturnType<typeof createLogger>;
+      runCmd: ReturnType<typeof createRunCmd>;
+    }) => void;
+  }
+  export default class CliCommand<
+    IArgs extends Record<string, any> = {},
+    IOpts extends Record<string, any> = {},
+  > {
+    childProgram: Command;
+    baseConfig: Required<CliCommandConfig<IArgs, IOpts>>;
+    constructor(config: CliCommandConfig<IArgs, IOpts>);
+    private normalizeConfig;
+    private createArguments;
+    private createOptions;
+    private createAction;
+    registerCommand(cliCore: CliCore): Command;
+  }
 }
-
-export interface CliCommandConfig<IArgs, IOpts> {
-  command: string;
-  description: string;
-  arguments?: Record<string, IArguments>;
-  options?: Record<string, IOptions>;
-  commands?: CliCommand[];
-  action?: (props: {
-    data: Partial<IArgs & IOpts>;
-    logger: Helpers["logger"];
-    helper: Omit<Helpers, "logger">;
-  }) => void;
+declare module "src/shared/cron" {
+  import { CronJob } from "cron";
+  import type { CronJobParameters } from "cron";
+  export default CronJob;
+  export const createCron: (options: CronJobParameters) => CronJob;
 }
-
-export class CliCommand<
-  IArgs extends Record<string, any> = {},
-  IOpts extends Record<string, any> = {},
-> {
-  childProgram: Command;
-  baseConfig: Required<CliCommandConfig<IArgs, IOpts>>;
-  constructor(config: CliCommandConfig<IArgs, IOpts>);
-  registerCommand(cliCore: CliCore): Command;
+declare module "src/shared/task" {
+  interface TaskItem {
+    title: string;
+    task: () => Promise<any>;
+  }
+  interface TaskConfig {
+    showLog?: boolean;
+  }
+  export default class Task {
+    tasks: TaskItem[];
+    config: TaskConfig;
+    constructor(config?: TaskConfig);
+    add(taskItem: TaskItem | TaskItem[]): this;
+    execute(): Promise<void>;
+  }
+  export const createTask: (option: TaskConfig) => Task;
 }
-
-interface Helpers {
-  logger: ReturnType<typeof Helper.createLogger>;
-  runPrompt: ReturnType<typeof Helper.createPrompt>;
-  runCmd: ReturnType<typeof Helper.createRunCmd>;
-  runCron: ReturnType<typeof Helper.createRunCron>;
-  runTask: ReturnType<typeof Helper.createRunTask>;
-}
-
-export interface CliCoreConfig {
-  name: string;
-  version: string;
-  description?: string;
-  commands?: CliCommand[];
-  configs?: { interactive?: boolean };
-}
-
-export default class CliCore {
-  program: Command;
-  baseConfig: Required<CliCoreConfig>;
-  helper: Helpers;
-  constructor(config: CliCoreConfig);
-  execute(): void;
+declare module "src/index" {
+  import CliCore from "src/cliCore";
+  import CliCommand from "src/cliCommand";
+  import { createPrompt } from "src/shared/prompt";
+  import { createCron } from "src/shared/cron";
+  import { createTask } from "src/shared/task";
+  export { CliCore, CliCommand, createPrompt, createCron, createTask };
 }
