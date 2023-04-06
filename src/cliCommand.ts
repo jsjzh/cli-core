@@ -1,14 +1,18 @@
 import { createCommand, createArgument, createOption } from "commander";
+import { formatChoices } from "./util";
 
 import type CliCore from "./cliCore";
 import type { Command } from "commander";
 import type createLogger from "./util/createLogger";
 import type createRunCmd from "./util/createRunCmd";
+import type { Choices, Choice } from "./shared/prompt";
+
+export type CliCommandChoices = Choices | (() => (string | Choice)[]);
 
 export interface BaseParams {
   description: string;
   default?: string | [string, string];
-  choices?: string[];
+  choices?: CliCommandChoices;
   optional?: boolean;
   multiple?: boolean;
 }
@@ -52,8 +56,8 @@ export default class CliCommand<
   IArgs extends Record<string, any> = {},
   IOpts extends Record<string, any> = {},
 > {
-  public childProgram: Command;
-  public baseConfig: Required<CliCommandConfig<IArgs, IOpts>>;
+  childProgram: Command;
+  baseConfig: Required<CliCommandConfig<IArgs, IOpts>>;
 
   constructor(config: CliCommandConfig<IArgs, IOpts>) {
     this.baseConfig = this.normalizeConfig(config);
@@ -84,8 +88,9 @@ export default class CliCommand<
 
       const argument = createArgument(cmd, item.description);
 
-      if (item.choices && Array.isArray(item.choices)) {
-        argument.choices(item.choices);
+      if (item.choices) {
+        const _choices = formatChoices(item.choices);
+        argument.choices(_choices.map((choice) => choice.name));
       }
 
       if (item.default) {
@@ -114,8 +119,9 @@ export default class CliCommand<
 
       const option = createOption(currentCmd, item.description);
 
-      if (item.choices && Array.isArray(item.choices)) {
-        option.choices(item.choices);
+      if (item.choices) {
+        const _choices = formatChoices(item.choices);
+        option.choices(_choices.map((choice) => choice.name));
       }
 
       if (item.default) {
@@ -137,6 +143,8 @@ export default class CliCommand<
       const _args = args.slice(0, args.length - 2);
       const _opts = args[args.length - 2];
 
+      // TODO 该如何解析输入的 choices 对应到 choice.value 上
+      
       let currArgs = Object.keys(this.baseConfig.arguments).reduce(
         (pre, curr, index) => ({ [curr]: _args[index], ...pre }),
         {},
@@ -152,7 +160,7 @@ export default class CliCommand<
     };
   }
 
-  public registerCommand(cliCore: CliCore) {
+  registerCommand(cliCore: CliCore) {
     const args = this.createArguments();
     const opts = this.createOptions();
     const action = this.createAction(cliCore);

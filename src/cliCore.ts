@@ -12,19 +12,33 @@ import type { Command } from "commander";
 import type { CreateLoggerConfig } from "./util/createLogger";
 
 interface CliCoreConfig {
+  /**
+   * 应用名
+   */
   name: string;
+  /**
+   * 应用版本号
+   */
   version: string;
+  /**
+   * 应用描述，默认取应用名
+   */
   description?: string;
   commands?: CliCommand[];
-  config?: { interactive?: boolean };
+  config?: {
+    /**
+     * 是否默认使用命令行模式，默认为 false
+     */
+    interactive?: boolean;
+  };
   loggerConfig?: CreateLoggerConfig;
 }
 
 export default class CliCore {
-  public program: Command;
-  public baseConfig: Required<Omit<CliCoreConfig, "loggerConfig">>;
-  public logger: ReturnType<typeof createLogger>;
-  public runCmd: ReturnType<typeof createRunCmd>;
+  program: Command;
+  baseConfig: Required<Omit<CliCoreConfig, "loggerConfig">>;
+  logger: ReturnType<typeof createLogger>;
+  runCmd: ReturnType<typeof createRunCmd>;
 
   constructor(config: CliCoreConfig) {
     this.baseConfig = this.normalizeConfig(config);
@@ -166,7 +180,7 @@ export default class CliCore {
     );
   }
 
-  public execute() {
+  execute() {
     this.program.parse();
   }
 }
