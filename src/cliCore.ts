@@ -53,7 +53,7 @@ export default class CliCore {
       version: config.version,
       description: config.description || config.name,
       commands: config.commands || [],
-      config: { interactive: false, ...(config.config || {}) },
+      config: { interactive: false, ...(config || {}) },
     };
   }
 
