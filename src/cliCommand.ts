@@ -1,8 +1,8 @@
 import { createCommand, createArgument, createOption } from "commander";
 
-import type { Command } from "commander";
 import type CliCore from "./cliCore";
-import type { Helpers } from "./cliCore";
+import type { Command } from "commander";
+import type createLogger from "./utils/createLogger";
 
 export interface IBaseParams {
   description: string;
@@ -42,8 +42,7 @@ interface CliCommandConfig<IArgs, IOpts> {
   commands?: CliCommand[];
   action?: (props: {
     data: Partial<IArgs & IOpts>;
-    logger: Helpers["logger"];
-    helper: Omit<Helpers, "logger">;
+    logger: ReturnType<typeof createLogger>;
   }) => void;
 }
 
@@ -145,8 +144,7 @@ export default class CliCommand<
 
       this.baseConfig.action({
         data: { ...currArgs, ...currOpts },
-        helper: cliCore.helper,
-        logger: cliCore.helper.logger,
+        logger: cliCore.logger,
       });
     };
   }

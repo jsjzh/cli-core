@@ -2,8 +2,6 @@ import type { Logger } from "winston";
 
 interface TaskItem {
   title: string;
-  // TODO 这里是不是可以改成像 promise 的 then 一样
-  // return 的数据，会变成下一个 task 的参数
   task: (...args: any) => Promise<any>;
 }
 

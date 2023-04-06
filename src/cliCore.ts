@@ -1,44 +1,43 @@
 import { createCommand, createOption } from "commander";
-import CliCommand, { IBaseParams } from "./cliCommand";
-import {
-  createLogger,
-  // 可迁移
-  createPrompt,
-  createRunCmd,
-  // 可删
-  createRunCron,
-  createRunTask,
-} from "./shared";
+import CliCommand from "./cliCommand";
+
+import createPrompt from "./shared/createPrompt";
+import createLogger from "./utils/createLogger";
 
 import * as utils from "./utils";
 
+import type { IBaseParams } from "./cliCommand";
 import type { Command } from "commander";
+import type { CreateLoggerConfig } from "./utils/createLogger";
 
 interface CliCoreConfig {
   name: string;
   version: string;
   description?: string;
   commands?: CliCommand[];
-  configs?: { interactive?: boolean };
-}
-
-export interface Helpers {
-  logger: ReturnType<typeof createLogger>;
-  runPrompt: ReturnType<typeof createPrompt>;
-  runCmd: ReturnType<typeof createRunCmd>;
-  runCron: ReturnType<typeof createRunCron>;
-  runTask: ReturnType<typeof createRunTask>;
+  config?: { interactive?: boolean };
+  loggerConfig?: Partial<CreateLoggerConfig>;
 }
 
 export default class CliCore {
   public program: Command;
-  public baseConfig: Required<CliCoreConfig>;
-  public helper: Helpers;
+  public baseConfig: Required<Omit<CliCoreConfig, "loggerConfig">>;
+  public logger: ReturnType<typeof createLogger>;
 
   constructor(config: CliCoreConfig) {
     this.baseConfig = this.normalizeConfig(config);
 
-    this.helper = this.createHelper();
+    this.logger = createLogger({
+      base: process.env.HOME!,
+      appName: this.baseConfig.name,
+      datePattern: "YYYY-MM-DD",
+      logName: "%DATE%.log",
+      maxSize: "20m",
+      maxFiles: "14d",
+      logLevel: "warn",
+      outputLevel: "info",
+      ...(config.loggerConfig || {}),
+    });
 
     this.program = this.createProgram();
 
@@ -51,13 +50,13 @@ export default class CliCore {
     this.registerCliCommand();
   }
 
-  private normalizeConfig(config: CliCoreConfig): Required<CliCoreConfig> {
+  private normalizeConfig(config: CliCoreConfig) {
     return {
       name: config.name,
       version: config.version,
       description: config.description || config.name,
       commands: config.commands || [],
-      configs: { interactive: false, ...(config.configs || {}) },
+      config: { interactive: false, ...(config.config || {}) },
     };
   }
 
@@ -67,22 +66,10 @@ export default class CliCore {
       .description(this.baseConfig.description);
   }
 
-  private createHelper() {
-    const logger = createLogger({ appName: this.baseConfig.name });
-
-    return {
-      logger,
-      runPrompt: createPrompt({ prefix: this.baseConfig.name }),
-      runCmd: createRunCmd(logger),
-      runCron: createRunCron(logger),
-      runTask: createRunTask(logger),
-    };
-  }
-
   private createInteractive() {
     return createOption("-i, --interactive", "使用交互式命令行运行").default(
-      this.baseConfig.configs.interactive,
-      String(this.baseConfig.configs.interactive),
+      this.baseConfig.config.interactive,
+      String(this.baseConfig.config.interactive),
     );
   }
 
@@ -94,8 +81,9 @@ export default class CliCore {
 
       if (_opts.interactive) {
         const createCliCorePrompt = (commands: CliCommand[]) => {
-          this.helper
-            .runPrompt<{ command: CliCommand }>()
+          createPrompt({ prefix: this.baseConfig.name })<{
+            command: CliCommand;
+          }>()
             .addRawList({
               name: "command",
               message: "please select the next command",
@@ -110,7 +98,9 @@ export default class CliCore {
               if (utils.haveLenArray(command.baseConfig.commands)) {
                 createCliCorePrompt(command.baseConfig.commands);
               } else {
-                const prompt = this.helper.runPrompt();
+                const prompt = createPrompt({
+                  prefix: this.baseConfig.name,
+                })();
 
                 const defaultAnswers: Record<string, any> = {};
 
@@ -134,16 +124,16 @@ export default class CliCore {
                       name,
                       message: item.description,
                       choices: item.choices!,
-                      default: setDefault(""),
+                      default: setDefault(undefined),
                     });
                   } else if (utils.isInput(item)) {
                     prompt.addInput({
                       name,
                       message: item.description,
-                      default: setDefault(""),
+                      default: setDefault(undefined),
                     });
                   } else {
-                    defaultAnswers[name] = setDefault("");
+                    defaultAnswers[name] = setDefault(undefined);
                   }
                 };
 
@@ -158,8 +148,7 @@ export default class CliCore {
                 prompt.execute((answers) => {
                   command.baseConfig.action({
                     data: { ...defaultAnswers, ...answers },
-                    helper: this.helper,
-                    logger: this.helper.logger,
+                    logger: this.logger,
                   });
                 });
               }
