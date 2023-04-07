@@ -6,7 +6,15 @@ import type CliCore from "./cliCore";
 import type { Command } from "commander";
 import type createLogger from "./util/createLogger";
 import type createRunCmd from "./util/createRunCmd";
-import type { Choices, Choice } from "./shared/prompt";
+
+export interface Choice {
+  key: string;
+  label?: string;
+  type?: "string" | "number" | "boolean";
+  value: any;
+}
+
+export type Choices = (string | Choice)[];
 
 export type CliCommandChoices = Choices | (() => (string | Choice)[]);
 

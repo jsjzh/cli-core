@@ -1,7 +1,7 @@
 import { createCommand, createOption } from "commander";
-import CliCommand from "./cliCommand";
+import CliCommand, { Choice } from "./cliCommand";
 
-import { Choice, createPrompt } from "./shared/prompt";
+import { createPrompt } from "./shared/prompt";
 
 import * as utils from "./util";
 import createLogger from "./util/createLogger";

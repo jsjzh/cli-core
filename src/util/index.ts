@@ -1,5 +1,9 @@
-import type { BaseParams, CliCommandChoices } from "@/cliCommand";
-import { Choice, Choices } from "@/shared/prompt";
+import type {
+  BaseParams,
+  Choice,
+  Choices,
+  CliCommandChoices,
+} from "@/cliCommand";
 
 // DONE
 // InputQuestion,

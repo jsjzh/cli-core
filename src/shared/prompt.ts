@@ -15,15 +15,6 @@ import type {
   EditorQuestion,
 } from "inquirer";
 
-export interface Choice {
-  key: string;
-  label?: string;
-  type?: "string" | "number" | "boolean";
-  value: any;
-}
-
-export type Choices = (string | number | boolean | Choice)[];
-
 interface BaseConfig {
   name: string;
   message: string;
@@ -39,15 +30,15 @@ interface ConfirmConfig extends BaseConfig {
   default?: boolean;
 }
 interface ListConfig extends BaseConfig {
-  choices: Choices;
+  choices: (string | { name: string; value: any })[];
   default?: string;
 }
 interface RawListConfig extends BaseConfig {
-  choices: Choices;
+  choices: (string | { name: string; value: any })[];
   default?: string;
 }
 interface CheckboxConfig extends BaseConfig {
-  choices: Choices;
+  choices: (string | { name: string; value: any })[];
   default?: string[];
 }
 interface PasswordConfig extends BaseConfig {
