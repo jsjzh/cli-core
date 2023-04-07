@@ -132,7 +132,7 @@ export default class CliCore {
                       message: item.description,
                       // TODO choices default 还需要校验一下
                       choices: item.choices?.map((choice) => ({
-                        name: choice.key,
+                        name: choice.label!,
                         value: choice.value,
                       }))!,
                       default: setDefault([]),
@@ -143,10 +143,10 @@ export default class CliCore {
                       message: item.description,
                       // TODO choices default 还需要校验一下
                       choices: item.choices?.map((choice) => ({
-                        name: choice.key,
-                        value: choice.value,
+                        name: choice.label!,
+                        value: choice.label,
                       }))!,
-                      default: setDefault(undefined),
+                      default: item.default,
                     });
                   } else if (utils.isInput(item)) {
                     prompt.addInput({
@@ -168,6 +168,9 @@ export default class CliCore {
                 );
 
                 prompt.execute((answers) => {
+                  // TODO 这里把值给塞进去
+                  console.log("answers", answers);
+
                   command.baseConfig.action({
                     data: { ...defaultAnswers, ...answers },
                     logger: this.logger,

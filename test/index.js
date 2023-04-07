@@ -5,20 +5,36 @@ const demo = new CliCommand({
   description: "测试指令",
   arguments: {
     name: {
-      description: "名称",
-      choices: () => [
-        { name: "foo", value: { age: 18 } },
-        { name: "bar", value: { age: 19 } },
+      description: "arguments 名称",
+      choices: [
+        {
+          key: "fookey",
+          label: "foolabel",
+          value: { age: 1, job: "foovalue" },
+        },
+        {
+          key: "barkey",
+          label: "barlabel",
+          value: "barvalue",
+        },
+        {
+          key: "abckey",
+          label: "abclabel",
+          value: { age: 3, job: "abcvalue" },
+        },
       ],
+      default: "barvalue",
     },
   },
   options: {
     names: {
-      description: "名称",
-      choices: () => [
-        { name: "foo", value: { age: 20 } },
-        { name: "bar", value: { age: 21 } },
+      description: "options 名称",
+      choices: [
+        { key: "xkey", label: "xlabel", value: { age: 4, job: "xvalue" } },
+        { key: "ykey", label: "ylabel", value: { age: 5, job: "yvalue" } },
+        { key: "zkey", label: "zlabel", value: { age: 6, job: "zvalue" } },
       ],
+      default: "ykey",
     },
   },
   action(props) {

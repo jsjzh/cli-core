@@ -9,9 +9,10 @@ import type createRunCmd from "./util/createRunCmd";
 
 export interface Choice {
   key: string;
-  label?: string;
-  type?: "string" | "number" | "boolean";
   value: any;
+  label?: string;
+
+  type?: "string" | "number" | "boolean";
 }
 
 export type Choices = (string | Choice)[];
@@ -20,7 +21,7 @@ export type CliCommandChoices = Choices | (() => (string | Choice)[]);
 
 export interface BaseParams<T = CliCommandChoices> {
   description: string;
-  default?: string | [string, string];
+  default?: string;
   choices?: T;
   optional?: boolean;
   multiple?: boolean;
@@ -131,14 +132,7 @@ export default class CliCommand<
       }
 
       // TODO choices default 还需要校验一下
-      if (item.default) {
-        argument.default.apply(
-          argument,
-          Array.isArray(item.default)
-            ? item.default
-            : [item.default, item.default],
-        );
-      }
+      argument.default.apply(argument, [item.default, item.default]);
 
       return argument;
     });
@@ -162,14 +156,7 @@ export default class CliCommand<
       }
 
       // TODO choices default 还需要校验一下
-      if (item.default) {
-        option.default.apply(
-          option,
-          Array.isArray(item.default)
-            ? item.default
-            : [item.default, item.default],
-        );
-      }
+      option.default.apply(option, [item.default, item.default]);
 
       return option;
     });
