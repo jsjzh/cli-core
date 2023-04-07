@@ -45,10 +45,12 @@
     "commander": "^10.0.0",
     "cron": "^2.3.0",
     "inquirer": "^9.1.5",
+    "lodash-es": "^4.17.21",
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.7",
     "@typescript-eslint/eslint-plugin": "^5.57.1",
     "@typescript-eslint/parser": "^5.57.1",
     "esbuild": "^0.17.15",

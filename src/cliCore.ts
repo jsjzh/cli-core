@@ -1,7 +1,7 @@
 import { createCommand, createOption } from "commander";
 import CliCommand from "./cliCommand";
 
-import { createPrompt } from "./shared/prompt";
+import { Choice, createPrompt } from "./shared/prompt";
 
 import * as utils from "./util";
 import createLogger from "./util/createLogger";
@@ -115,7 +115,10 @@ export default class CliCore {
                   prefix: this.baseConfig.name,
                 });
 
-                const createItem = (name: string, item: BaseParams) => {
+                const createItem = (
+                  name: string,
+                  item: BaseParams<Choice[]>,
+                ) => {
                   const setDefault = (d: any) =>
                     item.default
                       ? Array.isArray(item.default)

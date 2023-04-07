@@ -1,5 +1,10 @@
 declare module "src/shared/prompt" {
   import type { PromptModule, Question, Answers } from "inquirer";
+  export interface Choice {
+    name: string;
+    value: any;
+  }
+  export type Choices = (string | Choice)[];
   interface BaseConfig {
     name: string;
     message: string;
@@ -14,33 +19,15 @@ declare module "src/shared/prompt" {
     default?: boolean;
   }
   interface ListConfig extends BaseConfig {
-    choices: (
-      | {
-          name: string;
-          value: any;
-        }
-      | string
-    )[];
+    choices: Choices;
     default?: string;
   }
   interface RawListConfig extends BaseConfig {
-    choices: (
-      | {
-          name: string;
-          value: any;
-        }
-      | string
-    )[];
+    choices: Choices;
     default?: string;
   }
   interface CheckboxConfig extends BaseConfig {
-    choices: (
-      | {
-          name: string;
-          value: any;
-        }
-      | string
-    )[];
+    choices: Choices;
     default?: string[];
   }
   interface PasswordConfig extends BaseConfig {
@@ -75,11 +62,13 @@ declare module "src/shared/prompt" {
   ) => Prompt<T>;
 }
 declare module "src/util/index" {
-  import type { BaseParams } from "src/cliCommand";
+  import type { BaseParams, CliCommandChoices } from "src/cliCommand";
+  import { Choice } from "src/shared/prompt";
   export const isInput: (config: BaseParams) => boolean;
   export const isList: (config: BaseParams) => boolean;
   export const isCheckbox: (config: BaseParams) => boolean | undefined;
   export const haveLenArray: (arr: any) => boolean;
+  export const formatChoices: (choices: CliCommandChoices) => Choice[];
 }
 declare module "src/util/createLogger" {
   import winston from "winston";
@@ -121,11 +110,23 @@ declare module "src/cliCore" {
   import type { Command } from "commander";
   import type { CreateLoggerConfig } from "src/util/createLogger";
   interface CliCoreConfig {
+    /**
+     * 应用名
+     */
     name: string;
+    /**
+     * 应用版本号
+     */
     version: string;
+    /**
+     * 应用描述，默认取应用名
+     */
     description?: string;
     commands?: CliCommand[];
     config?: {
+      /**
+       * 是否默认使用命令行模式，默认为 false
+       */
       interactive?: boolean;
     };
     loggerConfig?: CreateLoggerConfig;
@@ -149,15 +150,17 @@ declare module "src/cliCommand" {
   import type { Command } from "commander";
   import type createLogger from "src/util/createLogger";
   import type createRunCmd from "src/util/createRunCmd";
-  export interface BaseParams {
+  import type { Choices, Choice } from "src/shared/prompt";
+  export type CliCommandChoices = Choices | (() => (string | Choice)[]);
+  export interface BaseParams<T = CliCommandChoices> {
     description: string;
     default?: string | [string, string];
-    choices?: string[];
+    choices?: T;
     optional?: boolean;
     multiple?: boolean;
   }
-  interface Arguments extends BaseParams {}
-  interface Options extends BaseParams {
+  interface Arguments<T = CliCommandChoices> extends BaseParams<T> {}
+  interface Options<T = CliCommandChoices> extends BaseParams<T> {
     alias?: string;
   }
   interface CliCommandConfig<IArgs, IOpts> {
@@ -177,7 +180,13 @@ declare module "src/cliCommand" {
     IOpts extends Record<string, any> = {},
   > {
     childProgram: Command;
-    baseConfig: Required<CliCommandConfig<IArgs, IOpts>>;
+    baseConfig: Omit<
+      Required<CliCommandConfig<IArgs, IOpts>>,
+      "arguments" | "options"
+    > & {
+      arguments: Record<string, Arguments<Choice[]>>;
+      options: Record<string, Options<Choice[]>>;
+    };
     constructor(config: CliCommandConfig<IArgs, IOpts>);
     private normalizeConfig;
     private createArguments;
