@@ -130,6 +130,7 @@ export default class CliCore {
                     prompt.addCheckbox({
                       name,
                       message: item.description,
+                      // TODO choices default 还需要校验一下
                       choices: item.choices!,
                       default: setDefault([]),
                     });
@@ -137,6 +138,7 @@ export default class CliCore {
                     prompt.addList({
                       name,
                       message: item.description,
+                      // TODO choices default 还需要校验一下
                       choices: item.choices!,
                       default: setDefault(undefined),
                     });

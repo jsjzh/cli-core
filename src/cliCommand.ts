@@ -130,6 +130,7 @@ export default class CliCommand<
         argument.choices(item.choices.map((choice) => choice.key));
       }
 
+      // TODO choices default 还需要校验一下
       if (item.default) {
         argument.default.apply(
           argument,
@@ -160,6 +161,7 @@ export default class CliCommand<
         option.choices(item.choices.map((choice) => choice.key));
       }
 
+      // TODO choices default 还需要校验一下
       if (item.default) {
         option.default.apply(
           option,
