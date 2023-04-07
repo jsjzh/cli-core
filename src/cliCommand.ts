@@ -1,4 +1,5 @@
 import { createCommand, createArgument, createOption } from "commander";
+import { cloneDeep } from "lodash-es";
 import { formatChoices } from "./util";
 
 import type CliCore from "./cliCore";
@@ -6,7 +7,6 @@ import type { Command } from "commander";
 import type createLogger from "./util/createLogger";
 import type createRunCmd from "./util/createRunCmd";
 import type { Choices, Choice } from "./shared/prompt";
-import { cloneDeep } from "lodash-es";
 
 export type CliCommandChoices = Choices | (() => (string | Choice)[]);
 
@@ -119,7 +119,7 @@ export default class CliCommand<
       const argument = createArgument(cmd, item.description);
 
       if (Array.isArray(item.choices)) {
-        argument.choices(item.choices.map((choice) => choice.name));
+        argument.choices(item.choices.map((choice) => choice.key));
       }
 
       if (item.default) {
@@ -149,7 +149,7 @@ export default class CliCommand<
       const option = createOption(currentCmd, item.description);
 
       if (Array.isArray(item.choices)) {
-        option.choices(item.choices.map((choice) => choice.name));
+        option.choices(item.choices.map((choice) => choice.key));
       }
 
       if (item.default) {
@@ -179,7 +179,7 @@ export default class CliCommand<
       Object.keys(currArgs).forEach((key) => {
         if (Array.isArray(this.baseConfig.arguments[key].choices)) {
           currArgs[key] = this.baseConfig.arguments[key].choices!.find(
-            (choice) => choice.name === currArgs[key],
+            (choice) => choice.key === currArgs[key],
           )?.value;
         }
       });
@@ -189,7 +189,7 @@ export default class CliCommand<
       Object.keys(currOpts).forEach((key) => {
         if (Array.isArray(this.baseConfig.options[key].choices)) {
           currOpts[key] = this.baseConfig.options[key].choices!.find(
-            (choice) => choice.name === currOpts[key],
+            (choice) => choice.key === currOpts[key],
           )?.value;
         }
       });

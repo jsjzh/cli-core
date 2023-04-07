@@ -36,7 +36,14 @@ export const formatChoices = (choices: CliCommandChoices) => {
   return _choices.reduce(
     (prev, curr) => [
       ...prev,
-      typeof curr === "string" ? { name: curr, value: curr } : curr,
+      typeof curr === "object"
+        ? curr
+        : {
+            key: String(curr),
+            label: String(curr),
+            type: typeof curr as "string" | "number" | "boolean",
+            value: curr,
+          },
     ],
     [] as Choice[],
   );

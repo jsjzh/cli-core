@@ -16,11 +16,13 @@ import type {
 } from "inquirer";
 
 export interface Choice {
-  name: string;
+  key: string;
+  label?: string;
+  type?: "string" | "number" | "boolean";
   value: any;
 }
 
-export type Choices = (string | Choice)[];
+export type Choices = (string | number | boolean | Choice)[];
 
 interface BaseConfig {
   name: string;
