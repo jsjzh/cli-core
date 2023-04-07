@@ -131,7 +131,10 @@ export default class CliCore {
                       name,
                       message: item.description,
                       // TODO choices default 还需要校验一下
-                      choices: item.choices!,
+                      choices: item.choices?.map((choice) => ({
+                        name: choice.key,
+                        value: choice.value,
+                      }))!,
                       default: setDefault([]),
                     });
                   } else if (utils.isList(item)) {
@@ -139,7 +142,10 @@ export default class CliCore {
                       name,
                       message: item.description,
                       // TODO choices default 还需要校验一下
-                      choices: item.choices!,
+                      choices: item.choices?.map((choice) => ({
+                        name: choice.key,
+                        value: choice.value,
+                      }))!,
                       default: setDefault(undefined),
                     });
                   } else if (utils.isInput(item)) {
