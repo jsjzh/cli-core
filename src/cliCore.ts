@@ -130,10 +130,9 @@ export default class CliCore {
                     prompt.addCheckbox({
                       name,
                       message: item.description,
-                      // TODO choices default 还需要校验一下
                       choices: item.choices?.map((choice) => ({
                         name: choice.label!,
-                        value: choice.value,
+                        value: choice.key,
                       }))!,
                       default: setDefault([]),
                     });
@@ -141,10 +140,9 @@ export default class CliCore {
                     prompt.addList({
                       name,
                       message: item.description,
-                      // TODO choices default 还需要校验一下
                       choices: item.choices?.map((choice) => ({
                         name: choice.label!,
-                        value: choice.label,
+                        value: choice.key,
                       }))!,
                       default: item.default,
                     });
@@ -159,20 +157,29 @@ export default class CliCore {
                   }
                 };
 
-                Object.keys(command.baseConfig.arguments).forEach((name) =>
-                  createItem(name, command.baseConfig.arguments[name]),
-                );
+                const _mergeParams = {
+                  ...command.baseConfig.arguments,
+                  ...command.baseConfig.options,
+                };
 
-                Object.keys(command.baseConfig.options).forEach((name) =>
-                  createItem(name, command.baseConfig.options[name]),
-                );
+                Object.keys(_mergeParams).forEach((name) => {
+                  createItem(name, _mergeParams[name]);
+                });
 
                 prompt.execute((answers) => {
-                  // TODO 这里把值给塞进去
-                  console.log("answers", answers);
+                  const _answers = Object.keys(answers).reduce(
+                    (pre, curr) => ({
+                      ...pre,
+                      [curr]:
+                        _mergeParams[curr].choices?.find(
+                          (choice) => choice.key === answers[curr],
+                        )?.value ?? answers[curr],
+                    }),
+                    answers,
+                  );
 
                   command.baseConfig.action({
-                    data: { ...defaultAnswers, ...answers },
+                    data: { ...defaultAnswers, ..._answers },
                     logger: this.logger,
                     runCmd: this.runCmd,
                   });

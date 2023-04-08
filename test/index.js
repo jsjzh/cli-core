@@ -4,30 +4,18 @@ const demo = new CliCommand({
   command: "demo",
   description: "测试指令",
   arguments: {
-    name: {
+    hello: {
       description: "arguments 名称",
       choices: [
-        {
-          key: "fookey",
-          label: "foolabel",
-          value: { age: 1, job: "foovalue" },
-        },
-        {
-          key: "barkey",
-          label: "barlabel",
-          value: "barvalue",
-        },
-        {
-          key: "abckey",
-          label: "abclabel",
-          value: { age: 3, job: "abcvalue" },
-        },
+        { key: "fookey", value: { age: 1, job: "foovalue" } },
+        { key: "barkey", value: "barvalue" },
+        { key: "abckey", value: { age: 3, job: "abcvalue" } },
       ],
-      default: "barvalue",
+      default: "abckey",
     },
   },
   options: {
-    names: {
+    world: {
       description: "options 名称",
       choices: [
         { key: "xkey", label: "xlabel", value: { age: 4, job: "xvalue" } },
