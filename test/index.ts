@@ -1,5 +1,10 @@
 import { CliCore, CliCommand } from "../lib";
 
+// 支持 input 输入
+// 支持 list 单选
+// 支持 checkbox 多选
+// 修改 prompt 的输入 key 和 arguments options 的 choices 一致
+
 const demo = new CliCommand({
   command: "demo",
   description: "测试指令",
