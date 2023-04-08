@@ -28,16 +28,16 @@ const createLogger = (config: CreateLoggerConfig) =>
   winston.createLogger({
     transports: [
       new DailyRotateFile({
-        level: config.logLevel || "warn",
+        level: config.logLevel ?? "warn",
         dirname: path.join(
-          config.base || process.env.HOME!,
+          config.base ?? process.env.HOME!,
           "logs",
           config.appName,
         ),
-        datePattern: config.datePattern || "YYYY-MM-DD",
-        filename: config.logName || "%DATE%.log",
-        maxSize: config.maxSize || "20m",
-        maxFiles: config.maxFiles || "14d",
+        datePattern: config.datePattern ?? "YYYY-MM-DD",
+        filename: config.logName ?? "%DATE%.log",
+        maxSize: config.maxSize ?? "20m",
+        maxFiles: config.maxFiles ?? "14d",
         format: winston.format.combine(
           winston.format.label({ label: config.appName }),
           winston.format.uncolorize(),
@@ -48,7 +48,7 @@ const createLogger = (config: CreateLoggerConfig) =>
         ),
       }),
       new winston.transports.Console({
-        level: config.outputLevel || "info",
+        level: config.outputLevel ?? "info",
         format: winston.format.combine(
           winston.format.label({ label: config.appName }),
           winston.format.colorize(),

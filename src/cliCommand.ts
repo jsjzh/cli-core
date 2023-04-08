@@ -21,7 +21,10 @@ export type CliCommandChoices = Choices | (() => (string | Choice)[]);
 
 export interface BaseParams<T = CliCommandChoices> {
   description: string;
-  default?: string;
+  // TODO multiple checkbox
+  // TODO 这里应该根据 multiple 有两种参数输入格式
+  // TODO 是不是需要新建一种 interface
+  default?: string | string[];
   choices?: T;
   optional?: boolean;
   multiple?: boolean;
@@ -108,13 +111,13 @@ export default class CliCommand<
     return {
       command: _config.command,
       description: _config.description,
-      arguments: (_config.arguments || {}) as Record<
+      arguments: (_config.arguments ?? {}) as Record<
         string,
         Arguments<Choice[]>
       >,
-      options: (_config.options || {}) as Record<string, Options<Choice[]>>,
-      commands: _config.commands || [],
-      action: _config.action || (() => {}),
+      options: (_config.options ?? {}) as Record<string, Options<Choice[]>>,
+      commands: _config.commands ?? [],
+      action: _config.action ?? (() => {}),
     };
   }
 
@@ -131,7 +134,7 @@ export default class CliCommand<
         argument.choices(item.choices.map((choice) => choice.key));
       }
 
-      // TODO choices default 还需要校验一下
+      // TODO multiple checkbox
       argument.default.apply(argument, [item.default, item.default]);
 
       return argument;
@@ -155,7 +158,7 @@ export default class CliCommand<
         option.choices(item.choices.map((choice) => choice.key));
       }
 
-      // TODO choices default 还需要校验一下
+      // TODO multiple checkbox
       option.default.apply(option, [item.default, item.default]);
 
       return option;
@@ -168,26 +171,30 @@ export default class CliCommand<
       const _args = args.slice(0, args.length - 2);
       const _opts = args[args.length - 2];
 
-      let currArgs = Object.keys(this.baseConfig.arguments).reduce(
+      const currArgs = Object.keys(this.baseConfig.arguments).reduce(
         (pre, curr, index) => ({ [curr]: _args[index], ...pre }),
         {} as Record<string, any>,
       );
 
+      // TODO multiple checkbox
       Object.keys(currArgs).forEach((key) => {
         if (Array.isArray(this.baseConfig.arguments[key].choices)) {
-          currArgs[key] = this.baseConfig.arguments[key].choices!.find(
-            (choice) => choice.key === currArgs[key],
-          )?.value;
+          currArgs[key] =
+            this.baseConfig.arguments[key].choices!.find(
+              (choice) => choice.key === currArgs[key],
+            )?.value ?? currArgs[key];
         }
       });
 
-      let currOpts = _opts;
+      const currOpts = _opts;
 
+      // TODO multiple checkbox
       Object.keys(currOpts).forEach((key) => {
         if (Array.isArray(this.baseConfig.options[key].choices)) {
-          currOpts[key] = this.baseConfig.options[key].choices!.find(
-            (choice) => choice.key === currOpts[key],
-          )?.value;
+          currOpts[key] =
+            this.baseConfig.options[key].choices!.find(
+              (choice) => choice.key === currOpts[key],
+            )?.value ?? currOpts[key];
         }
       });
 

@@ -45,7 +45,7 @@ export default class CliCore {
 
     this.logger = createLogger({
       appName: this.baseConfig.name,
-      ...(config.loggerConfig || {}),
+      ...(config.loggerConfig ?? {}),
     });
 
     this.runCmd = createRunCmd(this.logger);
@@ -65,8 +65,8 @@ export default class CliCore {
     return {
       name: config.name,
       version: config.version,
-      description: config.description || config.name,
-      commands: config.commands || [],
+      description: config.description ?? config.name,
+      commands: config.commands ?? [],
       config: { interactive: !!config.config?.interactive },
     };
   }
@@ -127,6 +127,7 @@ export default class CliCore {
                       : d;
 
                   if (utils.isCheckbox(item)) {
+                    // TODO multiple checkbox
                     prompt.addCheckbox({
                       name,
                       message: item.description,
@@ -134,7 +135,7 @@ export default class CliCore {
                         name: choice.label!,
                         value: choice.key,
                       }))!,
-                      default: setDefault([]),
+                      default: item.default || [],
                     });
                   } else if (utils.isList(item)) {
                     prompt.addList({
@@ -167,13 +168,20 @@ export default class CliCore {
                 });
 
                 prompt.execute((answers) => {
+                  // TODO multiple checkbox
                   const _answers = Object.keys(answers).reduce(
                     (pre, curr) => ({
                       ...pre,
-                      [curr]:
-                        _mergeParams[curr].choices?.find(
-                          (choice) => choice.key === answers[curr],
-                        )?.value ?? answers[curr],
+                      [curr]: _mergeParams[curr].multiple
+                        ? answers[curr].map(
+                            (answer: string) =>
+                              _mergeParams[curr].choices?.find(
+                                (choice) => choice.key === answer,
+                              )?.value ?? answers[curr],
+                          )
+                        : _mergeParams[curr].choices?.find(
+                            (choice) => choice.key === answers[curr],
+                          )?.value ?? answers[curr],
                     }),
                     answers,
                   );

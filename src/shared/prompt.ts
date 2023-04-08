@@ -67,9 +67,9 @@ export default class Prompt<T extends Answers> {
 
   private normalizeConfig(config: PromptConfig) {
     return {
-      prefix: config.prefix || "",
-      suffix: config.suffix || "",
-      initialAnswers: config.initialAnswers || {},
+      prefix: config.prefix ?? "",
+      suffix: config.suffix ?? "",
+      initialAnswers: config.initialAnswers ?? {},
     };
   }
 
@@ -79,7 +79,7 @@ export default class Prompt<T extends Answers> {
       name: inputConfig.name,
       message: inputConfig.message,
       default:
-        inputConfig.default || this.baseConfig.initialAnswers[inputConfig.name],
+        inputConfig.default ?? this.baseConfig.initialAnswers[inputConfig.name],
       ...this.baseConfig,
     };
 
@@ -94,7 +94,7 @@ export default class Prompt<T extends Answers> {
       name: numberConfig.name,
       message: numberConfig.message,
       default:
-        numberConfig.default ||
+        numberConfig.default ??
         this.baseConfig.initialAnswers[numberConfig.name],
       ...this.baseConfig,
     };
@@ -110,7 +110,7 @@ export default class Prompt<T extends Answers> {
       name: confirmConfig.name,
       message: confirmConfig.message,
       default:
-        confirmConfig.default ||
+        confirmConfig.default ??
         this.baseConfig.initialAnswers[confirmConfig.name],
       ...this.baseConfig,
     };
@@ -127,7 +127,7 @@ export default class Prompt<T extends Answers> {
       message: listConfig.message,
       choices: listConfig.choices,
       default:
-        listConfig.default || this.baseConfig.initialAnswers[listConfig.name],
+        listConfig.default ?? this.baseConfig.initialAnswers[listConfig.name],
       ...this.baseConfig,
     };
 
@@ -143,7 +143,7 @@ export default class Prompt<T extends Answers> {
       message: rawListConfig.message,
       choices: rawListConfig.choices,
       default:
-        rawListConfig.default ||
+        rawListConfig.default ??
         this.baseConfig.initialAnswers[rawListConfig.name],
       ...this.baseConfig,
     };
@@ -163,7 +163,7 @@ export default class Prompt<T extends Answers> {
       message: checkboxConfig.message,
       choices: checkboxConfig.choices,
       default:
-        checkboxConfig.default ||
+        checkboxConfig.default ??
         this.baseConfig.initialAnswers[checkboxConfig.name],
       ...this.baseConfig,
     };
@@ -179,7 +179,7 @@ export default class Prompt<T extends Answers> {
       name: passwordConfig.name,
       message: passwordConfig.message,
       default:
-        passwordConfig.default ||
+        passwordConfig.default ??
         this.baseConfig.initialAnswers[passwordConfig.name],
       ...this.baseConfig,
     };
@@ -195,7 +195,7 @@ export default class Prompt<T extends Answers> {
       name: editorConfig.name,
       message: editorConfig.message,
       default:
-        editorConfig.default ||
+        editorConfig.default ??
         this.baseConfig.initialAnswers[editorConfig.name],
       ...this.baseConfig,
     };
@@ -219,4 +219,4 @@ export default class Prompt<T extends Answers> {
 }
 
 export const createPrompt = <T extends Answers>(config?: PromptConfig) =>
-  new Prompt<T>(config || {});
+  new Prompt<T>(config ?? {});
