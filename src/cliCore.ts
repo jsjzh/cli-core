@@ -1,5 +1,5 @@
 import { createCommand, createOption } from "commander";
-import CliCommand, { InnerChoiceItem } from "./cliCommand";
+import CliCommand from "./cliCommand";
 
 import { createPrompt } from "./shared/prompt";
 
@@ -7,8 +7,8 @@ import * as utils from "./util";
 import createLogger from "./util/createLogger";
 import createRunCmd from "./util/createRunCmd";
 
-import type { InnerBaseParams } from "./cliCommand";
 import type { Command } from "commander";
+import type { InnerBaseParams, InnerChoiceItem } from "./cliCommand";
 import type { CreateLoggerConfig } from "./util/createLogger";
 
 interface CliCoreConfig {
@@ -115,10 +115,7 @@ export default class CliCore {
                   prefix: this.baseConfig.name,
                 });
 
-                const createItem = (
-                  name: string,
-                  item: InnerBaseParams<InnerChoiceItem[]>,
-                ) => {
+                const createItem = (name: string, item: InnerBaseParams) => {
                   const setDefault = (d: any) =>
                     item.default
                       ? Array.isArray(item.default)

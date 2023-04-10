@@ -54,6 +54,13 @@ interface PromptConfig {
   initialAnswers?: Answers;
 }
 
+// TODO 入参需要统一一下，key value label choices
+// interface ChoiceItem {
+//   key: string;
+//   value: any;
+//   label?: string;
+// }
+
 export default class Prompt<T extends Answers> {
   promptModule: PromptModule;
   baseConfig: Required<PromptConfig>;

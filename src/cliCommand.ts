@@ -233,6 +233,7 @@ export default class CliCommand<
     });
   }
 
+  // TODO 待验证 default multiple optional
   private createAction(cliCore: CliCore) {
     return (...args: any[]) => {
       const instance: Command = args[args.length - 1];
@@ -244,30 +245,40 @@ export default class CliCommand<
         {} as Record<string, any>,
       );
 
-      // TODO 这里要把 default 值加上去
-      // 然后也要把 value 给加上，不管是简单类型还是复杂类型的 value
-      // 然后如果是多选的类型，要多个值
-
-      // TODO multiple checkbox
       Object.keys(currArgs).forEach((key) => {
-        if (Array.isArray(this.baseConfig.arguments[key].choices)) {
+        if (!currArgs[key] && this.baseConfig.arguments[key].default) {
+          currArgs[key] = this.baseConfig.arguments[key].default;
+        }
+
+        if (!this.baseConfig.arguments[key].multiple) {
+          currArgs[key] = [currArgs[key]];
+        }
+
+        currArgs[key].forEach((valueKey: string) => {
           currArgs[key] =
             this.baseConfig.arguments[key].choices!.find(
-              (choice) => choice.key === currArgs[key],
-            )?.value ?? currArgs[key];
-        }
+              (choice) => choice.key === valueKey,
+            )?.value ?? currArgs[key][valueKey];
+        });
       });
 
       const currOpts = _opts;
 
-      // TODO multiple checkbox
       Object.keys(currOpts).forEach((key) => {
-        if (Array.isArray(this.baseConfig.options[key].choices)) {
+        if (!currOpts[key] && this.baseConfig.options[key].default) {
+          currOpts[key] = this.baseConfig.options[key].default;
+        }
+
+        if (!this.baseConfig.options[key].multiple) {
+          currOpts[key] = [currOpts[key]];
+        }
+
+        currOpts[key].forEach((valueKey: string) => {
           currOpts[key] =
             this.baseConfig.options[key].choices!.find(
-              (choice) => choice.key === currOpts[key],
-            )?.value ?? currOpts[key];
-        }
+              (choice) => choice.key === valueKey,
+            )?.value ?? currOpts[key][valueKey];
+        });
       });
 
       this.baseConfig.action({
