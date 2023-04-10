@@ -109,6 +109,7 @@ export default class CliCore {
               if (utils.haveLenArray(command.baseConfig.commands)) {
                 createCliCorePrompt(command.baseConfig.commands);
               } else {
+                // TODO 这里开始，需要搞搞
                 const defaultAnswers: Record<string, any> = {};
 
                 const prompt = createPrompt({
