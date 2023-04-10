@@ -139,7 +139,9 @@ export default class CliCommand<
           _config.arguments![key].description = key;
         }
 
-        if (typeof _config.arguments![key].default === "string") {
+        if (!_config.arguments![key].default) {
+          _config.arguments![key].default = [];
+        } else if (typeof _config.arguments![key].default === "string") {
           _config.arguments![key].default = [
             _config.arguments![key].default as string,
           ];
@@ -162,7 +164,9 @@ export default class CliCommand<
           _config.options![key].description = key;
         }
 
-        if (typeof _config.options![key].default === "string") {
+        if (_config.options![key].default) {
+          _config.options![key].default = [];
+        } else if (typeof _config.options![key].default === "string") {
           _config.options![key].default = [
             _config.options![key].default as string,
           ];
@@ -229,9 +233,6 @@ export default class CliCommand<
     });
   }
 
-  // TODO 这里要把 default 值加上去
-  // 然后也要把 value 给加上，不管是简单类型还是复杂类型的 value
-  // 然后如果是多选的类型，要多个值
   private createAction(cliCore: CliCore) {
     return (...args: any[]) => {
       const instance: Command = args[args.length - 1];
@@ -242,6 +243,10 @@ export default class CliCommand<
         (pre, curr, index) => ({ [curr]: _args[index], ...pre }),
         {} as Record<string, any>,
       );
+
+      // TODO 这里要把 default 值加上去
+      // 然后也要把 value 给加上，不管是简单类型还是复杂类型的 value
+      // 然后如果是多选的类型，要多个值
 
       // TODO multiple checkbox
       Object.keys(currArgs).forEach((key) => {
