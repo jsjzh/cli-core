@@ -1,36 +1,54 @@
 import { createCommand, createArgument, createOption } from "commander";
 import { cloneDeep } from "lodash-es";
-import { formatChoices } from "./util";
 
 import type CliCore from "./cliCore";
 import type { Command } from "commander";
 import type createLogger from "./util/createLogger";
 import type createRunCmd from "./util/createRunCmd";
 
-export interface Choice {
+const formatChoices = (choices: CliCommandChoices) => {
+  let _choices: Choices;
+
+  if (typeof choices === "function") {
+    _choices = choices();
+  } else {
+    _choices = choices;
+  }
+
+  _choices.forEach((item, key) => {
+    if (typeof item === "string") {
+      _choices[key] = { key: String(item), label: String(item), value: item };
+    } else {
+      if (!item.label) {
+        item.label = item.key;
+      }
+    }
+  });
+
+  return _choices as InnerChoiceItem[];
+};
+
+interface ChoiceItem {
   key: string;
   value: any;
   label?: string;
 }
 
-export type Choices = (string | Choice)[];
+type Choices = (string | ChoiceItem)[];
 
-export type CliCommandChoices = Choices | (() => (string | Choice)[]);
+type CliCommandChoices = Choices | (() => Choices);
 
-export interface BaseParams<T = CliCommandChoices> {
+interface BaseParams<T> {
   description?: string;
-  // TODO multiple checkbox
-  // TODO 这里应该根据 multiple 有两种参数输入格式
-  // TODO 是不是需要新建一种 interface
   default?: string | string[];
   choices?: T;
   optional?: boolean;
   multiple?: boolean;
 }
 
-interface Arguments<T = CliCommandChoices> extends BaseParams<T> {}
+interface Arguments<T> extends BaseParams<T> {}
 
-interface Options<T = CliCommandChoices> extends BaseParams<T> {
+interface Options<T> extends BaseParams<T> {
   alias?: string;
 }
 
@@ -38,23 +56,23 @@ interface CliCommandConfig<IArgs, IOpts> {
   command: string;
   description?: string;
   // 必选
-  // cli demo <message> xxx
+  // cli cmd <message> xxx
   // 可选
-  // cli demo [message] xxx
+  // cli cmd [message] xxx
   // 多参数
-  // cli demo [message...] xxx xxx
-  arguments?: Record<string, Arguments>;
+  // cli cmd [message...] xxx xxx
+  arguments?: Record<string, Arguments<CliCommandChoices>>;
   // 必选
-  // cli demo <base> xxx
+  // cli cmd <base> xxx
   // 可选
-  // cli demo [base] xxx
+  // cli cmd [base] xxx
   // 多参数
-  // cli demo [base...] xxx xxx
+  // cli cmd [base...] xxx xxx
   // 布尔
-  // cli demo <base>
+  // cli cmd <base>
   // 短名
-  // cli demo <b> xxx
-  options?: Record<string, Options>;
+  // cli cmd <b> xxx
+  options?: Record<string, Options<CliCommandChoices>>;
   commands?: CliCommand[];
   action?: (props: {
     data: Partial<IArgs & IOpts>;
@@ -63,18 +81,45 @@ interface CliCommandConfig<IArgs, IOpts> {
   }) => void;
 }
 
+interface InnerCliCommandConfig<IArgs, IOpts> {
+  command: string;
+  description: string;
+  arguments: Record<string, InnerArguments>;
+  options: Record<string, InnerOptions>;
+  commands: CliCommand[];
+  action: (props: {
+    data: Partial<IArgs & IOpts>;
+    logger: ReturnType<typeof createLogger>;
+    runCmd: ReturnType<typeof createRunCmd>;
+  }) => void;
+}
+
+export interface InnerBaseParams {
+  description: string;
+  default: string[];
+  choices: InnerChoiceItem[];
+  optional: boolean;
+  multiple: boolean;
+}
+
+interface InnerArguments extends InnerBaseParams {}
+
+interface InnerOptions extends InnerBaseParams {
+  alias?: string;
+}
+
+export interface InnerChoiceItem {
+  key: string;
+  value: any;
+  label: string;
+}
+
 export default class CliCommand<
   IArgs extends Record<string, any> = {},
   IOpts extends Record<string, any> = {},
 > {
   childProgram: Command;
-  baseConfig: Omit<
-    Required<CliCommandConfig<IArgs, IOpts>>,
-    "arguments" | "options"
-  > & {
-    arguments: Record<string, Arguments<Choice[]>>;
-    options: Record<string, Options<Choice[]>>;
-  };
+  baseConfig: InnerCliCommandConfig<IArgs, IOpts>;
 
   constructor(config: CliCommandConfig<IArgs, IOpts>) {
     this.baseConfig = this.normalizeConfig(config);
@@ -83,37 +128,62 @@ export default class CliCommand<
     );
   }
 
-  private normalizeConfig(config: CliCommandConfig<IArgs, IOpts>) {
+  private normalizeConfig(
+    config: CliCommandConfig<IArgs, IOpts>,
+  ): InnerCliCommandConfig<IArgs, IOpts> {
     const _config = cloneDeep(config);
 
     if (_config.arguments) {
       Object.keys(_config.arguments).forEach((key) => {
+        if (!_config.arguments![key].description) {
+          _config.arguments![key].description = key;
+        }
+
+        if (typeof _config.arguments![key].default === "string") {
+          _config.arguments![key].default = [
+            _config.arguments![key].default as string,
+          ];
+        }
+
         if (_config.arguments![key].choices) {
           _config.arguments![key].choices = formatChoices(
             _config.arguments![key].choices!,
           );
         }
+
+        _config.arguments![key].multiple = !!_config.arguments![key].multiple;
+        _config.arguments![key].optional = !!_config.arguments![key].optional;
       });
     }
 
     if (_config.options) {
       Object.keys(_config.options).forEach((key) => {
+        if (!_config.options![key].description) {
+          _config.options![key].description = key;
+        }
+
+        if (typeof _config.options![key].default === "string") {
+          _config.options![key].default = [
+            _config.options![key].default as string,
+          ];
+        }
+
         if (_config.options![key].choices) {
           _config.options![key].choices = formatChoices(
             _config.options![key].choices!,
           );
         }
+
+        _config.options![key].multiple = !!_config.options![key].multiple;
+        _config.options![key].optional = !!_config.options![key].optional;
       });
     }
 
     return {
       command: _config.command,
       description: _config.description ?? _config.command,
-      arguments: (_config.arguments ?? {}) as Record<
-        string,
-        Arguments<Choice[]>
-      >,
-      options: (_config.options ?? {}) as Record<string, Options<Choice[]>>,
+      arguments: (_config.arguments ?? {}) as Record<string, InnerArguments>,
+      options: (_config.options ?? {}) as Record<string, InnerOptions>,
       commands: _config.commands ?? [],
       action: _config.action ?? (() => {}),
     };
@@ -126,18 +196,12 @@ export default class CliCommand<
       const name = item.multiple ? `${key}...` : key;
       const cmd = item.optional ? `[${name}]` : `<${name}>`;
 
-      const argument = createArgument(cmd, item.description ?? key);
+      const argument = createArgument(cmd, item.description);
 
-      if (Array.isArray(item.choices)) {
-        argument.choices(item.choices.map((choice) => choice.key));
-      }
+      argument.choices(item.choices.map((choice) => choice.key));
 
-      if (item.multiple && Array.isArray(item.default)) {
-        const currentDefault = item.default.join(", ");
-        argument.default(currentDefault, currentDefault);
-      } else {
-        argument.default(item.default as string, item.default as string);
-      }
+      const currentDefault = item.default.join(", ");
+      argument.default(currentDefault, currentDefault);
 
       return argument;
     });
@@ -154,23 +218,20 @@ export default class CliCommand<
         ? `-${item.alias}, --${key} ${cmd}`
         : `--${key} ${cmd}`;
 
-      const option = createOption(currentCmd, item.description ?? key);
+      const option = createOption(currentCmd, item.description);
 
-      if (Array.isArray(item.choices)) {
-        option.choices(item.choices.map((choice) => choice.key));
-      }
+      option.choices(item.choices.map((choice) => choice.key));
 
-      if (item.multiple && Array.isArray(item.default)) {
-        const currentDefault = item.default.join(", ");
-        option.default(currentDefault, currentDefault);
-      } else {
-        option.default(item.default as string, item.default as string);
-      }
+      const currentDefault = item.default.join(", ");
+      option.default(currentDefault, currentDefault);
 
       return option;
     });
   }
 
+  // TODO 这里要把 default 值加上去
+  // 然后也要把 value 给加上，不管是简单类型还是复杂类型的 value
+  // 然后如果是多选的类型，要多个值
   private createAction(cliCore: CliCore) {
     return (...args: any[]) => {
       const instance: Command = args[args.length - 1];

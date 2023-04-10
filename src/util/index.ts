@@ -1,9 +1,4 @@
-import type {
-  BaseParams,
-  Choice,
-  Choices,
-  CliCommandChoices,
-} from "@/cliCommand";
+import type { InnerBaseParams } from "@/cliCommand";
 
 // DONE
 // InputQuestion,
@@ -17,37 +12,13 @@ import type {
 // PasswordQuestion,
 // EditorQuestion,
 
-export const isInput = (config: BaseParams) => !config.optional;
+export const isInput = (config: InnerBaseParams) => !config.optional;
 
-export const isList = (config: BaseParams) =>
+export const isList = (config: InnerBaseParams) =>
   !config.optional && Array.isArray(config.choices);
 
-export const isCheckbox = (config: BaseParams) =>
+export const isCheckbox = (config: InnerBaseParams) =>
   !config.optional && Array.isArray(config.choices) && config.multiple;
 
 export const haveLenArray = (arr: any) =>
   !!(Array.isArray(arr) && arr.length > 0);
-
-export const formatChoices = (choices: CliCommandChoices) => {
-  let _choices: Choices;
-
-  if (typeof choices === "function") {
-    _choices = choices();
-  } else {
-    _choices = choices;
-  }
-
-  return _choices.reduce(
-    (prev, curr) => [
-      ...prev,
-      typeof curr === "object"
-        ? curr
-        : {
-            key: String(curr),
-            label: String(curr),
-            value: curr,
-          },
-    ],
-    [] as Choice[],
-  );
-};
