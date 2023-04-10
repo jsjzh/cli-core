@@ -11,8 +11,6 @@ export interface Choice {
   key: string;
   value: any;
   label?: string;
-
-  type?: "string" | "number" | "boolean";
 }
 
 export type Choices = (string | Choice)[];
@@ -20,7 +18,7 @@ export type Choices = (string | Choice)[];
 export type CliCommandChoices = Choices | (() => (string | Choice)[]);
 
 export interface BaseParams<T = CliCommandChoices> {
-  description: string;
+  description?: string;
   // TODO multiple checkbox
   // TODO 这里应该根据 multiple 有两种参数输入格式
   // TODO 是不是需要新建一种 interface
@@ -38,7 +36,7 @@ interface Options<T = CliCommandChoices> extends BaseParams<T> {
 
 interface CliCommandConfig<IArgs, IOpts> {
   command: string;
-  description: string;
+  description?: string;
   // 必选
   // cli demo <message> xxx
   // 可选
@@ -110,7 +108,7 @@ export default class CliCommand<
 
     return {
       command: _config.command,
-      description: _config.description,
+      description: _config.description ?? _config.command,
       arguments: (_config.arguments ?? {}) as Record<
         string,
         Arguments<Choice[]>
@@ -128,14 +126,18 @@ export default class CliCommand<
       const name = item.multiple ? `${key}...` : key;
       const cmd = item.optional ? `[${name}]` : `<${name}>`;
 
-      const argument = createArgument(cmd, item.description);
+      const argument = createArgument(cmd, item.description ?? key);
 
       if (Array.isArray(item.choices)) {
         argument.choices(item.choices.map((choice) => choice.key));
       }
 
-      // TODO multiple checkbox
-      argument.default.apply(argument, [item.default, item.default]);
+      if (item.multiple && Array.isArray(item.default)) {
+        const currentDefault = item.default.join(", ");
+        argument.default(currentDefault, currentDefault);
+      } else {
+        argument.default(item.default as string, item.default as string);
+      }
 
       return argument;
     });
@@ -152,14 +154,18 @@ export default class CliCommand<
         ? `-${item.alias}, --${key} ${cmd}`
         : `--${key} ${cmd}`;
 
-      const option = createOption(currentCmd, item.description);
+      const option = createOption(currentCmd, item.description ?? key);
 
       if (Array.isArray(item.choices)) {
         option.choices(item.choices.map((choice) => choice.key));
       }
 
-      // TODO multiple checkbox
-      option.default.apply(option, [item.default, item.default]);
+      if (item.multiple && Array.isArray(item.default)) {
+        const currentDefault = item.default.join(", ");
+        option.default(currentDefault, currentDefault);
+      } else {
+        option.default(item.default as string, item.default as string);
+      }
 
       return option;
     });

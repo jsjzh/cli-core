@@ -164,6 +164,7 @@ export default class CliCore {
                 };
 
                 Object.keys(_mergeParams).forEach((name) => {
+                  // TODO optional 的应该怎么处理呢？
                   createItem(name, _mergeParams[name]);
                 });
 

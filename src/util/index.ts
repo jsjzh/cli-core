@@ -45,7 +45,6 @@ export const formatChoices = (choices: CliCommandChoices) => {
         : {
             key: String(curr),
             label: String(curr),
-            type: typeof curr as "string" | "number" | "boolean",
             value: curr,
           },
     ],
