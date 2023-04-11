@@ -99,7 +99,7 @@ export default class CliCore {
               name: "command",
               message: "please select the next command",
               choices: commands.map((command) => ({
-                name: command.baseConfig.command,
+                name: command.baseConfig.name,
                 value: command,
               })),
             })

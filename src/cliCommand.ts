@@ -6,7 +6,7 @@ import type { Command } from "commander";
 import type createLogger from "./util/createLogger";
 import type createRunCmd from "./util/createRunCmd";
 
-const formatChoices = (choices: CliCommandChoices) => {
+export const formatChoices = (choices: CliCommandChoices) => {
   let _choices: Choices;
 
   if (typeof choices === "function") {
@@ -55,7 +55,7 @@ interface Options<T> extends BaseParams<T> {
 }
 
 interface CliCommandConfig<IArgs, IOpts> {
-  command: string;
+  name: string;
   description?: string;
   // 必选
   // cli cmd <message> xxx
@@ -84,7 +84,7 @@ interface CliCommandConfig<IArgs, IOpts> {
 }
 
 interface InnerCliCommandConfig<IArgs, IOpts> {
-  command: string;
+  name: string;
   description: string;
   arguments: Record<string, InnerArguments>;
   options: Record<string, InnerOptions>;
@@ -125,7 +125,7 @@ export default class CliCommand<
 
   constructor(config: CliCommandConfig<IArgs, IOpts>) {
     this.baseConfig = this.normalizeConfig(config);
-    this.childProgram = createCommand(this.baseConfig.command).description(
+    this.childProgram = createCommand(this.baseConfig.name).description(
       this.baseConfig.description,
     );
   }
@@ -186,8 +186,8 @@ export default class CliCommand<
     }
 
     return {
-      command: _config.command,
-      description: _config.description ?? _config.command,
+      name: _config.name,
+      description: _config.description ?? _config.name,
       arguments: (_config.arguments ?? {}) as Record<string, InnerArguments>,
       options: (_config.options ?? {}) as Record<string, InnerOptions>,
       commands: _config.commands ?? [],
