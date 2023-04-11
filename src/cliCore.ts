@@ -122,7 +122,6 @@ export default class CliCore {
 
                 Object.keys(_mergeParams).forEach((name) => {
                   // 只有参数为必选的时候，才会被 prompt 所接收
-                  // TODO 待验证 default multiple optional
                   if (!_mergeParams[name].optional) {
                     if (
                       _mergeParams[name].choices &&

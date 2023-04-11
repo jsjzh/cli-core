@@ -232,7 +232,6 @@ export default class CliCommand<
     });
   }
 
-  // TODO 待验证 default multiple optional
   private createAction(cliCore: CliCore) {
     return (...args: any[]) => {
       const instance: Command = args[args.length - 1];
