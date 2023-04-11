@@ -163,7 +163,7 @@ export default class CliCommand<
           config.options![key].description = key;
         }
 
-        if (config.options![key].default) {
+        if (!config.options![key].default) {
           config.options![key].default = [];
         } else if (typeof config.options![key].default === "string") {
           config.options![key].default = [

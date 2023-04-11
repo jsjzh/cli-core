@@ -3,7 +3,6 @@ import CliCommand from "./cliCommand";
 
 import { createPrompt } from "./shared/prompt";
 
-import * as utils from "./util";
 import createLogger from "./util/createLogger";
 import createRunCmd from "./util/createRunCmd";
 
@@ -106,55 +105,15 @@ export default class CliCore {
             .execute((answers) => {
               const command = answers.command;
 
-              if (utils.haveLenArray(command.baseConfig.commands)) {
+              if (
+                Array.isArray(command.baseConfig.commands) &&
+                command.baseConfig.commands.length
+              ) {
                 createCliCorePrompt(command.baseConfig.commands);
               } else {
-                // TODO 这里开始，需要搞搞
-                // const defaultAnswers: Record<string, any> = {};
-
                 const prompt = createPrompt({
                   prefix: this.baseConfig.name,
                 });
-
-                // const createItem = (name: string, item: InnerBaseParams) => {
-                //   const setDefault = (d: any) =>
-                //     item.default
-                //       ? Array.isArray(item.default)
-                //         ? (item.default[0] as any)
-                //         : (item.default as any)
-                //       : d;
-
-                //   if (utils.isCheckbox(item)) {
-                //     // TODO multiple checkbox
-                //     prompt.addCheckbox({
-                //       name,
-                //       message: item.description,
-                //       choices: item.choices?.map((choice) => ({
-                //         name: choice.label!,
-                //         value: choice.key,
-                //       }))!,
-                //       default: item.default || [],
-                //     });
-                //   } else if (utils.isList(item)) {
-                //     prompt.addList({
-                //       name,
-                //       message: item.description,
-                //       choices: item.choices?.map((choice) => ({
-                //         name: choice.label!,
-                //         value: choice.key,
-                //       }))!,
-                //       default: item.default,
-                //     });
-                //   } else if (utils.isInput(item)) {
-                //     prompt.addInput({
-                //       name,
-                //       message: item.description,
-                //       default: setDefault(undefined),
-                //     });
-                //   } else {
-                //     defaultAnswers[name] = setDefault(undefined);
-                //   }
-                // };
 
                 const _mergeParams = {
                   ...command.baseConfig.arguments,
@@ -163,6 +122,7 @@ export default class CliCore {
 
                 Object.keys(_mergeParams).forEach((name) => {
                   // 只有参数为必选的时候，才会被 prompt 所接收
+                  // TODO 待验证 default multiple optional
                   if (!_mergeParams[name].optional) {
                     if (
                       _mergeParams[name].choices &&
@@ -174,7 +134,7 @@ export default class CliCore {
                         choices: _mergeParams[name].choices,
                         default: _mergeParams[name].default,
                       });
-                    } else if (_mergeParams[name].choices) {
+                    } else if (Array.isArray(_mergeParams[name].choices)) {
                       prompt.addList({
                         name,
                         description: _mergeParams[name].description,
@@ -189,32 +149,11 @@ export default class CliCore {
                       });
                     }
                   }
-
-                  // createItem(name, _mergeParams[name]);
                 });
 
                 prompt.execute((answers) => {
-                  // TODO multiple checkbox
-                  // const _answers = Object.keys(answers).reduce(
-                  //   (pre, curr) => ({
-                  //     ...pre,
-                  //     [curr]: _mergeParams[curr].multiple
-                  //       ? answers[curr].map(
-                  //           (answer: string) =>
-                  //             _mergeParams[curr].choices?.find(
-                  //               (choice) => choice.key === answer,
-                  //             )?.value ?? answers[curr],
-                  //         )
-                  //       : _mergeParams[curr].choices?.find(
-                  //           (choice) => choice.key === answers[curr],
-                  //         )?.value ?? answers[curr],
-                  //   }),
-                  //   answers,
-                  // );
-
                   command.baseConfig.action({
                     data: answers,
-                    // data: { ...defaultAnswers, ..._answers },
                     logger: this.logger,
                     runCmd: this.runCmd,
                   });
