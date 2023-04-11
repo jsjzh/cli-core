@@ -8,6 +8,7 @@ lib
 .vscode
 logs
 typings
+coverage
 
 yarn-error.log
 npm-debug.log*
