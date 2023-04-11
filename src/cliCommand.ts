@@ -28,13 +28,15 @@ const formatChoices = (choices: CliCommandChoices) => {
   return _choices as InnerChoiceItem[];
 };
 
-interface ChoiceItem {
+// prompt 里面的 choices 也统一成这样的格式，在 prompt 中做转换
+// 所以这里给 export 出去
+export interface ChoiceItem {
   key: string;
   value: any;
   label?: string;
 }
 
-type Choices = (string | ChoiceItem)[];
+export type Choices = (string | ChoiceItem)[];
 
 type CliCommandChoices = Choices | (() => Choices);
 

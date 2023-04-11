@@ -161,8 +161,26 @@ export default class CliCore {
                   ...command.baseConfig.options,
                 };
 
+                console.log("_mergeParams", _mergeParams);
+
                 Object.keys(_mergeParams).forEach((name) => {
                   // TODO optional 的应该怎么处理呢？
+
+                  // 只有参数为必选的时候，才会被 prompt 所接收
+                  if (!_mergeParams[name].optional) {
+                    if (_mergeParams[name].choices) {
+                      prompt.addCheckbox({
+                        name,
+                        message: _mergeParams[name].description,
+                        choices: _mergeParams[name].choices?.map((choice) => ({
+                          name: choice.label!,
+                          value: choice.key,
+                        })),
+                        default: _mergeParams[name].default,
+                      });
+                    }
+                  }
+
                   createItem(name, _mergeParams[name]);
                 });
 
