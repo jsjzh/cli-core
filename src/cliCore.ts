@@ -97,9 +97,9 @@ export default class CliCore {
           }>({ prefix: this.baseConfig.name })
             .addRawList({
               name: "command",
-              message: "please select the next command",
+              description: "please select the next command",
               choices: commands.map((command) => ({
-                name: command.baseConfig.name,
+                key: command.baseConfig.name,
                 value: command,
               })),
             })
@@ -110,101 +110,111 @@ export default class CliCore {
                 createCliCorePrompt(command.baseConfig.commands);
               } else {
                 // TODO 这里开始，需要搞搞
-                const defaultAnswers: Record<string, any> = {};
+                // const defaultAnswers: Record<string, any> = {};
 
                 const prompt = createPrompt({
                   prefix: this.baseConfig.name,
                 });
 
-                const createItem = (name: string, item: InnerBaseParams) => {
-                  const setDefault = (d: any) =>
-                    item.default
-                      ? Array.isArray(item.default)
-                        ? (item.default[0] as any)
-                        : (item.default as any)
-                      : d;
+                // const createItem = (name: string, item: InnerBaseParams) => {
+                //   const setDefault = (d: any) =>
+                //     item.default
+                //       ? Array.isArray(item.default)
+                //         ? (item.default[0] as any)
+                //         : (item.default as any)
+                //       : d;
 
-                  if (utils.isCheckbox(item)) {
-                    // TODO multiple checkbox
-                    prompt.addCheckbox({
-                      name,
-                      message: item.description,
-                      choices: item.choices?.map((choice) => ({
-                        name: choice.label!,
-                        value: choice.key,
-                      }))!,
-                      default: item.default || [],
-                    });
-                  } else if (utils.isList(item)) {
-                    prompt.addList({
-                      name,
-                      message: item.description,
-                      choices: item.choices?.map((choice) => ({
-                        name: choice.label!,
-                        value: choice.key,
-                      }))!,
-                      default: item.default,
-                    });
-                  } else if (utils.isInput(item)) {
-                    prompt.addInput({
-                      name,
-                      message: item.description,
-                      default: setDefault(undefined),
-                    });
-                  } else {
-                    defaultAnswers[name] = setDefault(undefined);
-                  }
-                };
+                //   if (utils.isCheckbox(item)) {
+                //     // TODO multiple checkbox
+                //     prompt.addCheckbox({
+                //       name,
+                //       message: item.description,
+                //       choices: item.choices?.map((choice) => ({
+                //         name: choice.label!,
+                //         value: choice.key,
+                //       }))!,
+                //       default: item.default || [],
+                //     });
+                //   } else if (utils.isList(item)) {
+                //     prompt.addList({
+                //       name,
+                //       message: item.description,
+                //       choices: item.choices?.map((choice) => ({
+                //         name: choice.label!,
+                //         value: choice.key,
+                //       }))!,
+                //       default: item.default,
+                //     });
+                //   } else if (utils.isInput(item)) {
+                //     prompt.addInput({
+                //       name,
+                //       message: item.description,
+                //       default: setDefault(undefined),
+                //     });
+                //   } else {
+                //     defaultAnswers[name] = setDefault(undefined);
+                //   }
+                // };
 
                 const _mergeParams = {
                   ...command.baseConfig.arguments,
                   ...command.baseConfig.options,
                 };
 
-                console.log("_mergeParams", _mergeParams);
-
                 Object.keys(_mergeParams).forEach((name) => {
-                  // TODO optional 的应该怎么处理呢？
-
                   // 只有参数为必选的时候，才会被 prompt 所接收
                   if (!_mergeParams[name].optional) {
-                    if (_mergeParams[name].choices) {
+                    if (
+                      _mergeParams[name].choices &&
+                      _mergeParams[name].multiple
+                    ) {
                       prompt.addCheckbox({
                         name,
-                        message: _mergeParams[name].description,
-                        choices: _mergeParams[name].choices?.map((choice) => ({
-                          name: choice.label!,
-                          value: choice.key,
-                        })),
+                        description: _mergeParams[name].description,
+                        choices: _mergeParams[name].choices,
                         default: _mergeParams[name].default,
+                      });
+                    } else if (_mergeParams[name].choices) {
+                      prompt.addList({
+                        name,
+                        description: _mergeParams[name].description,
+                        choices: _mergeParams[name].choices,
+                        default: _mergeParams[name].default[0],
+                      });
+                    } else {
+                      prompt.addInput({
+                        name,
+                        description: _mergeParams[name].description,
+                        default: _mergeParams[name].default[0],
                       });
                     }
                   }
 
-                  createItem(name, _mergeParams[name]);
+                  // createItem(name, _mergeParams[name]);
                 });
 
                 prompt.execute((answers) => {
                   // TODO multiple checkbox
-                  const _answers = Object.keys(answers).reduce(
-                    (pre, curr) => ({
-                      ...pre,
-                      [curr]: _mergeParams[curr].multiple
-                        ? answers[curr].map(
-                            (answer: string) =>
-                              _mergeParams[curr].choices?.find(
-                                (choice) => choice.key === answer,
-                              )?.value ?? answers[curr],
-                          )
-                        : _mergeParams[curr].choices?.find(
-                            (choice) => choice.key === answers[curr],
-                          )?.value ?? answers[curr],
-                    }),
-                    answers,
-                  );
+                  // const _answers = Object.keys(answers).reduce(
+                  //   (pre, curr) => ({
+                  //     ...pre,
+                  //     [curr]: _mergeParams[curr].multiple
+                  //       ? answers[curr].map(
+                  //           (answer: string) =>
+                  //             _mergeParams[curr].choices?.find(
+                  //               (choice) => choice.key === answer,
+                  //             )?.value ?? answers[curr],
+                  //         )
+                  //       : _mergeParams[curr].choices?.find(
+                  //           (choice) => choice.key === answers[curr],
+                  //         )?.value ?? answers[curr],
+                  //   }),
+                  //   answers,
+                  // );
 
                   command.baseConfig.action({
-                    data: { ...defaultAnswers, ..._answers },
+                    data: answers,
+                    // data: { ...defaultAnswers, ..._answers },
                     logger: this.logger,
                     runCmd: this.runCmd,
                   });

@@ -1,5 +1,4 @@
 import { createCommand, createArgument, createOption } from "commander";
-import { cloneDeep } from "lodash-es";
 
 import type CliCore from "./cliCore";
 import type { Command } from "commander";
@@ -133,65 +132,63 @@ export default class CliCommand<
   private normalizeConfig(
     config: CliCommandConfig<IArgs, IOpts>,
   ): InnerCliCommandConfig<IArgs, IOpts> {
-    const _config = cloneDeep(config);
-
-    if (_config.arguments) {
-      Object.keys(_config.arguments).forEach((key) => {
-        if (!_config.arguments![key].description) {
-          _config.arguments![key].description = key;
+    if (config.arguments) {
+      Object.keys(config.arguments).forEach((key) => {
+        if (!config.arguments![key].description) {
+          config.arguments![key].description = key;
         }
 
-        if (!_config.arguments![key].default) {
-          _config.arguments![key].default = [];
-        } else if (typeof _config.arguments![key].default === "string") {
-          _config.arguments![key].default = [
-            _config.arguments![key].default as string,
+        if (!config.arguments![key].default) {
+          config.arguments![key].default = [];
+        } else if (typeof config.arguments![key].default === "string") {
+          config.arguments![key].default = [
+            config.arguments![key].default as string,
           ];
         }
 
-        if (_config.arguments![key].choices) {
-          _config.arguments![key].choices = formatChoices(
-            _config.arguments![key].choices!,
+        if (config.arguments![key].choices) {
+          config.arguments![key].choices = formatChoices(
+            config.arguments![key].choices!,
           );
         }
 
-        _config.arguments![key].multiple = !!_config.arguments![key].multiple;
-        _config.arguments![key].optional = !!_config.arguments![key].optional;
+        config.arguments![key].multiple = !!config.arguments![key].multiple;
+        config.arguments![key].optional = !!config.arguments![key].optional;
       });
     }
 
-    if (_config.options) {
-      Object.keys(_config.options).forEach((key) => {
-        if (!_config.options![key].description) {
-          _config.options![key].description = key;
+    if (config.options) {
+      Object.keys(config.options).forEach((key) => {
+        if (!config.options![key].description) {
+          config.options![key].description = key;
         }
 
-        if (_config.options![key].default) {
-          _config.options![key].default = [];
-        } else if (typeof _config.options![key].default === "string") {
-          _config.options![key].default = [
-            _config.options![key].default as string,
+        if (config.options![key].default) {
+          config.options![key].default = [];
+        } else if (typeof config.options![key].default === "string") {
+          config.options![key].default = [
+            config.options![key].default as string,
           ];
         }
 
-        if (_config.options![key].choices) {
-          _config.options![key].choices = formatChoices(
-            _config.options![key].choices!,
+        if (config.options![key].choices) {
+          config.options![key].choices = formatChoices(
+            config.options![key].choices!,
           );
         }
 
-        _config.options![key].multiple = !!_config.options![key].multiple;
-        _config.options![key].optional = !!_config.options![key].optional;
+        config.options![key].multiple = !!config.options![key].multiple;
+        config.options![key].optional = !!config.options![key].optional;
       });
     }
 
     return {
-      name: _config.name,
-      description: _config.description ?? _config.name,
-      arguments: (_config.arguments ?? {}) as Record<string, InnerArguments>,
-      options: (_config.options ?? {}) as Record<string, InnerOptions>,
-      commands: _config.commands ?? [],
-      action: _config.action ?? (() => {}),
+      name: config.name,
+      description: config.description ?? config.name,
+      arguments: (config.arguments ?? {}) as Record<string, InnerArguments>,
+      options: (config.options ?? {}) as Record<string, InnerOptions>,
+      commands: config.commands ?? [],
+      action: config.action ?? (() => {}),
     };
   }
 
