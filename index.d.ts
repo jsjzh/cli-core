@@ -1,13 +1,9 @@
 declare module "src/shared/prompt" {
   import type { PromptModule, Question, Answers } from "inquirer";
-  export interface Choice {
-    name: string;
-    value: any;
-  }
-  export type Choices = (string | Choice)[];
+  import { ChoiceItem, Choices } from "src/cliCommand";
   interface BaseConfig {
     name: string;
-    message: string;
+    description?: string;
   }
   interface InputConfig extends BaseConfig {
     default?: string;
@@ -22,12 +18,24 @@ declare module "src/shared/prompt" {
     choices: Choices;
     default?: string;
   }
+  interface InnerListConfig extends BaseConfig {
+    choices: ChoiceItem[];
+    default?: string;
+  }
   interface RawListConfig extends BaseConfig {
     choices: Choices;
     default?: string;
   }
+  interface InnerRawListConfig extends BaseConfig {
+    choices: ChoiceItem[];
+    default?: string;
+  }
   interface CheckboxConfig extends BaseConfig {
     choices: Choices;
+    default?: string[];
+  }
+  interface InnerCheckboxConfig extends BaseConfig {
+    choices: ChoiceItem[];
     default?: string[];
   }
   interface PasswordConfig extends BaseConfig {
@@ -44,9 +52,19 @@ declare module "src/shared/prompt" {
   export default class Prompt<T extends Answers> {
     promptModule: PromptModule;
     baseConfig: Required<PromptConfig>;
-    prompts: Question[];
+    prompts: Record<string, Question>;
+    configs: Record<
+      string,
+      | InputConfig
+      | NumberConfig
+      | ConfirmConfig
+      | InnerListConfig
+      | InnerRawListConfig
+      | InnerCheckboxConfig
+      | PasswordConfig
+      | EditorConfig
+    >;
     constructor(config: PromptConfig);
-    private normalizeConfig;
     addInput(inputConfig: InputConfig): this;
     addNumber(numberConfig: NumberConfig): this;
     addConfirm(confirmConfig: ConfirmConfig): this;
@@ -60,15 +78,6 @@ declare module "src/shared/prompt" {
   export const createPrompt: <T extends Answers>(
     config?: PromptConfig,
   ) => Prompt<T>;
-}
-declare module "src/util/index" {
-  import type { BaseParams, CliCommandChoices } from "src/cliCommand";
-  import { Choice } from "src/shared/prompt";
-  export const isInput: (config: BaseParams) => boolean;
-  export const isList: (config: BaseParams) => boolean;
-  export const isCheckbox: (config: BaseParams) => boolean | undefined;
-  export const haveLenArray: (arr: any) => boolean;
-  export const formatChoices: (choices: CliCommandChoices) => Choice[];
 }
 declare module "src/util/createLogger" {
   import winston from "winston";
@@ -137,11 +146,6 @@ declare module "src/cliCore" {
     logger: ReturnType<typeof createLogger>;
     runCmd: ReturnType<typeof createRunCmd>;
     constructor(config: CliCoreConfig);
-    private normalizeConfig;
-    private createProgram;
-    private createInteractive;
-    private createAction;
-    private registerCliCommand;
     execute(): void;
   }
 }
@@ -150,24 +154,30 @@ declare module "src/cliCommand" {
   import type { Command } from "commander";
   import type createLogger from "src/util/createLogger";
   import type createRunCmd from "src/util/createRunCmd";
-  import type { Choices, Choice } from "src/shared/prompt";
-  export type CliCommandChoices = Choices | (() => (string | Choice)[]);
-  export interface BaseParams<T = CliCommandChoices> {
-    description: string;
-    default?: string | [string, string];
+  export const formatChoices: (choices: CliCommandChoices) => InnerChoiceItem[];
+  export interface ChoiceItem {
+    key: string;
+    value: any;
+    label?: string;
+  }
+  export type Choices = (string | ChoiceItem)[];
+  type CliCommandChoices = Choices | (() => Choices);
+  interface BaseParams<T> {
+    description?: string;
+    default?: string | string[];
     choices?: T;
     optional?: boolean;
     multiple?: boolean;
   }
-  interface Arguments<T = CliCommandChoices> extends BaseParams<T> {}
-  interface Options<T = CliCommandChoices> extends BaseParams<T> {
+  interface Arguments<T> extends BaseParams<T> {}
+  interface Options<T> extends BaseParams<T> {
     alias?: string;
   }
   interface CliCommandConfig<IArgs, IOpts> {
-    command: string;
-    description: string;
-    arguments?: Record<string, Arguments>;
-    options?: Record<string, Options>;
+    name: string;
+    description?: string;
+    arguments?: Record<string, Arguments<CliCommandChoices>>;
+    options?: Record<string, Options<CliCommandChoices>>;
     commands?: CliCommand[];
     action?: (props: {
       data: Partial<IArgs & IOpts>;
@@ -175,23 +185,41 @@ declare module "src/cliCommand" {
       runCmd: ReturnType<typeof createRunCmd>;
     }) => void;
   }
+  interface InnerCliCommandConfig<IArgs, IOpts> {
+    name: string;
+    description: string;
+    arguments: Record<string, InnerArguments>;
+    options: Record<string, InnerOptions>;
+    commands: CliCommand[];
+    action: (props: {
+      data: Partial<IArgs & IOpts>;
+      logger: ReturnType<typeof createLogger>;
+      runCmd: ReturnType<typeof createRunCmd>;
+    }) => void;
+  }
+  export interface InnerBaseParams {
+    description: string;
+    default: string[];
+    choices: InnerChoiceItem[];
+    optional: boolean;
+    multiple: boolean;
+  }
+  interface InnerArguments extends InnerBaseParams {}
+  interface InnerOptions extends InnerBaseParams {
+    alias?: string;
+  }
+  export interface InnerChoiceItem {
+    key: string;
+    value: any;
+    label: string;
+  }
   export default class CliCommand<
     IArgs extends Record<string, any> = {},
     IOpts extends Record<string, any> = {},
   > {
     childProgram: Command;
-    baseConfig: Omit<
-      Required<CliCommandConfig<IArgs, IOpts>>,
-      "arguments" | "options"
-    > & {
-      arguments: Record<string, Arguments<Choice[]>>;
-      options: Record<string, Options<Choice[]>>;
-    };
+    baseConfig: InnerCliCommandConfig<IArgs, IOpts>;
     constructor(config: CliCommandConfig<IArgs, IOpts>);
-    private normalizeConfig;
-    private createArguments;
-    private createOptions;
-    private createAction;
     registerCommand(cliCore: CliCore): Command;
   }
 }

@@ -22,6 +22,9 @@ dependencies:
   lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
+  tslib:
+    specifier: ^2.5.0
+    version: 2.5.0
   winston:
     specifier: ^3.8.2
     version: 3.8.2
