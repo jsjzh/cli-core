@@ -1,9 +1,9 @@
 import { createCommand, createArgument, createOption } from "commander";
 
-import type CliCore from "./cliCore";
+import type CliCore from "@/core/cliCore";
 import type { Command } from "commander";
-import type createLogger from "./util/createLogger";
-import type createRunCmd from "./util/createRunCmd";
+import type createLogger from "@/util/createLogger";
+import type createRunCmd from "@/util/createRunCmd";
 
 export const formatChoices = (choices: CliCommandChoices) => {
   let _choices: Choices;

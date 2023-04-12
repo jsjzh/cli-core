@@ -1,14 +1,13 @@
 import { createCommand, createOption } from "commander";
-import CliCommand from "./cliCommand";
+import CliCommand from "@/core/cliCommand";
 
-import { createPrompt } from "./shared/prompt";
+import { createPrompt } from "@/shared/prompt";
 
-import createLogger from "./util/createLogger";
-import createRunCmd from "./util/createRunCmd";
+import createLogger from "@/util/createLogger";
+import createRunCmd from "@/util/createRunCmd";
 
 import type { Command } from "commander";
-import type { InnerBaseParams, InnerChoiceItem } from "./cliCommand";
-import type { CreateLoggerConfig } from "./util/createLogger";
+import type { CreateLoggerConfig } from "@/util/createLogger";
 
 interface CliCoreConfig {
   /**

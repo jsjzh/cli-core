@@ -14,7 +14,7 @@ import type {
   PasswordQuestion,
   EditorQuestion,
 } from "inquirer";
-import { ChoiceItem, Choices, formatChoices } from "@/cliCommand";
+import { ChoiceItem, Choices, formatChoices } from "@/core/cliCommand";
 
 interface BaseConfig {
   name: string;

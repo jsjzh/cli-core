@@ -1,9 +1,29 @@
-import * as Cli from "..";
+import {
+  CliCore,
+  CliCommand,
+  createCron,
+  createPrompt,
+  createTask,
+} from "@/index";
 
-describe("CliCore", () => {
-  it("exports modules should be defined", () => {
-    Object.keys(Cli).forEach((module) => {
-      expect((Cli as any)[module]).toBeDefined();
-    });
+describe("@oishi/cli-core", () => {
+  it("CliCore 可用", () => {
+    expect(CliCore).toBeDefined();
+  });
+
+  it("CliCommand 可用", () => {
+    expect(CliCommand).toBeDefined();
+  });
+
+  it("createCron 可用", () => {
+    expect(createCron).toBeDefined();
+  });
+
+  it("createPrompt 可用", () => {
+    expect(createPrompt).toBeDefined();
+  });
+
+  it("createTask 可用", () => {
+    expect(createTask).toBeDefined();
   });
 });
