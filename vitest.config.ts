@@ -1,8 +1,9 @@
-import path from "path";
+import path from "node:path";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    alias: { "@": path.resolve("./src") },
+    globals: true,
+    alias: { src: path.resolve(__dirname, "src") },
   },
 });
