@@ -98,7 +98,7 @@ interface InnerCliCommandConfig<IArgs, IOpts> {
 export interface InnerBaseParams {
   description: string;
   default: string[];
-  choices: InnerChoiceItem[];
+  choices?: InnerChoiceItem[];
   optional: boolean;
   multiple: boolean;
 }
@@ -119,8 +119,9 @@ export default class CliCommand<
   IArgs extends Record<string, any> = {},
   IOpts extends Record<string, any> = {},
 > {
-  childProgram: Command;
-  baseConfig: InnerCliCommandConfig<IArgs, IOpts>;
+  private childProgram: Command;
+  // 这里的值只会被 cliCore 用到，所以 index.d.ts 中不需要向用户曝露这个值
+  public baseConfig: InnerCliCommandConfig<IArgs, IOpts>;
 
   constructor(config: CliCommandConfig<IArgs, IOpts>) {
     this.baseConfig = this.normalizeConfig(config);
@@ -201,7 +202,9 @@ export default class CliCommand<
 
       const argument = createArgument(cmd, item.description);
 
-      argument.choices(item.choices.map((choice) => choice.key));
+      if (Array.isArray(item.choices)) {
+        argument.choices(item.choices.map((choice) => choice.key));
+      }
 
       const currentDefault = item.default.join(", ");
       argument.default(currentDefault, currentDefault);
@@ -223,7 +226,9 @@ export default class CliCommand<
 
       const option = createOption(currentCmd, item.description);
 
-      option.choices(item.choices.map((choice) => choice.key));
+      if (Array.isArray(item.choices)) {
+        option.choices(item.choices.map((choice) => choice.key));
+      }
 
       const currentDefault = item.default.join(", ");
       option.default(currentDefault, currentDefault);
@@ -287,7 +292,7 @@ export default class CliCommand<
     };
   }
 
-  registerCommand(cliCore: CliCore) {
+  public registerCommand(cliCore: CliCore) {
     const args = this.createArguments();
     const opts = this.createOptions();
     const action = this.createAction(cliCore);

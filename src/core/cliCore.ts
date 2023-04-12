@@ -33,10 +33,10 @@ interface CliCoreConfig {
 }
 
 export default class CliCore {
-  program: Command;
-  baseConfig: Required<Omit<CliCoreConfig, "loggerConfig">>;
-  logger: ReturnType<typeof createLogger>;
-  runCmd: ReturnType<typeof createRunCmd>;
+  private program: Command;
+  private baseConfig: Required<Omit<CliCoreConfig, "loggerConfig">>;
+  public logger: ReturnType<typeof createLogger>;
+  public runCmd: ReturnType<typeof createRunCmd>;
 
   constructor(config: CliCoreConfig) {
     this.baseConfig = this.normalizeConfig(config);
@@ -129,14 +129,14 @@ export default class CliCore {
                       prompt.addCheckbox({
                         name,
                         description: _mergeParams[name].description,
-                        choices: _mergeParams[name].choices,
+                        choices: _mergeParams[name].choices!,
                         default: _mergeParams[name].default,
                       });
                     } else if (Array.isArray(_mergeParams[name].choices)) {
                       prompt.addList({
                         name,
                         description: _mergeParams[name].description,
-                        choices: _mergeParams[name].choices,
+                        choices: _mergeParams[name].choices!,
                         default: _mergeParams[name].default[0],
                       });
                     } else {
@@ -173,7 +173,7 @@ export default class CliCore {
     );
   }
 
-  execute() {
+  public execute() {
     this.program.parse();
   }
 }

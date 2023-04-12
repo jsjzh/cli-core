@@ -4,8 +4,8 @@ import Task, { createTask } from "@/shared/task";
 
 const sum = (a: number, b: number) => a + b;
 
-describe("cron", () => {
-  test("cron", () => {
+describe("cronJob", () => {
+  test("cronJob", () => {
     expect(
       createCronJob({
         cronTime: "* * * * * *",
