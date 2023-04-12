@@ -4,4 +4,4 @@ import type { CronJobParameters } from "cron";
 
 export default CronJob;
 
-export const createCron = (options: CronJobParameters) => new CronJob(options);
+export const createCronJob = (options: CronJobParameters) => new CronJob(options);

@@ -1,6 +1,6 @@
 interface TaskItem {
   title: string;
-  task: () => Promise<any>;
+  task: () => void | Promise<any>;
 }
 
 interface TaskConfig {
@@ -8,22 +8,22 @@ interface TaskConfig {
 }
 
 export default class Task {
-  tasks: TaskItem[];
-  config: TaskConfig;
+  private tasks: TaskItem[];
+  private config: TaskConfig;
 
   constructor(config?: TaskConfig) {
     this.tasks = [];
     this.config = { showLog: config?.showLog ?? true };
   }
 
-  add(taskItem: TaskItem | TaskItem[]) {
+  public add(taskItem: TaskItem | TaskItem[]) {
     Array.isArray(taskItem)
       ? (this.tasks = this.tasks.concat(taskItem))
       : this.tasks.push(taskItem);
     return this;
   }
 
-  async execute() {
+  public async execute() {
     for (const item of this.tasks) {
       this.config.showLog && console.log(`${item.title} START`);
       await item.task();
@@ -32,4 +32,4 @@ export default class Task {
   }
 }
 
-export const createTask = (option: TaskConfig) => new Task(option);
+export const createTask = (option?: TaskConfig) => new Task(option);

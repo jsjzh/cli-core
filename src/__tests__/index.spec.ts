@@ -1,7 +1,7 @@
 import {
   CliCore,
   CliCommand,
-  createCron,
+  createCronJob,
   createPrompt,
   createTask,
 } from "@/index";
@@ -15,8 +15,8 @@ describe("@oishi/cli-core", () => {
     expect(CliCommand).toBeDefined();
   });
 
-  it("createCron 可用", () => {
-    expect(createCron).toBeDefined();
+  it("createCronJob 可用", () => {
+    expect(createCronJob).toBeDefined();
   });
 
   it("createPrompt 可用", () => {

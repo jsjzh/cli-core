@@ -1,15 +1,28 @@
-import cron from "@/shared/cron";
-import prompt from "@/shared/prompt";
-import task from "@/shared/task";
+import CronJob, { createCronJob } from "@/shared/cronJob";
+import Prompt, { createPrompt } from "@/shared/prompt";
+import Task, { createTask } from "@/shared/task";
 
 describe("cron", () => {
-  it("cron", () => {});
+  it("cron", () => {
+    expect(
+      createCronJob({
+        cronTime: "* * * * * *",
+        onTick() {
+          console.log("hello world");
+        },
+      }),
+    ).toBeInstanceOf(CronJob);
+  });
 });
 
 describe("prompt", () => {
-  it("prompt", () => {});
+  it("prompt", () => {
+    expect(createPrompt()).toBeInstanceOf(Prompt);
+  });
 });
 
 describe("task", () => {
-  it("task", () => {});
+  it("task", () => {
+    expect(createTask()).toBeInstanceOf(Task);
+  });
 });

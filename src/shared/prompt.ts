@@ -74,10 +74,10 @@ interface PromptConfig {
 }
 
 export default class Prompt<T extends Answers> {
-  promptModule: PromptModule;
-  baseConfig: Required<PromptConfig>;
-  prompts: Record<string, Question>;
-  configs: Record<
+  private promptModule: PromptModule;
+  private baseConfig: Required<PromptConfig>;
+  private prompts: Record<string, Question>;
+  private configs: Record<
     string,
     | InputConfig
     | NumberConfig
@@ -104,7 +104,7 @@ export default class Prompt<T extends Answers> {
     };
   }
 
-  addInput(inputConfig: InputConfig) {
+  public addInput(inputConfig: InputConfig) {
     const inputQuestion: InputQuestion = {
       type: "input",
       name: inputConfig.name,
@@ -120,7 +120,7 @@ export default class Prompt<T extends Answers> {
     return this;
   }
 
-  addNumber(numberConfig: NumberConfig) {
+  public addNumber(numberConfig: NumberConfig) {
     const numberQuestion: NumberQuestion = {
       type: "number",
       name: numberConfig.name,
@@ -137,7 +137,7 @@ export default class Prompt<T extends Answers> {
     return this;
   }
 
-  addConfirm(confirmConfig: ConfirmConfig) {
+  public addConfirm(confirmConfig: ConfirmConfig) {
     const confirmQuestion: ConfirmQuestion = {
       type: "confirm",
       name: confirmConfig.name,
@@ -154,7 +154,7 @@ export default class Prompt<T extends Answers> {
     return this;
   }
 
-  addList(listConfig: ListConfig) {
+  public addList(listConfig: ListConfig) {
     const _choices = formatChoices(listConfig.choices);
 
     const listQuestion: ListQuestion = {
@@ -184,7 +184,7 @@ export default class Prompt<T extends Answers> {
     return this;
   }
 
-  addRawList(rawListConfig: RawListConfig) {
+  public addRawList(rawListConfig: RawListConfig) {
     const _choices = formatChoices(rawListConfig.choices);
 
     const rawListQuestion: RawListQuestion = {
@@ -214,7 +214,7 @@ export default class Prompt<T extends Answers> {
   // TODO
   // addExpand(expandConfig: {}) {}
 
-  addCheckbox(checkboxConfig: CheckboxConfig) {
+  public addCheckbox(checkboxConfig: CheckboxConfig) {
     const _choices = formatChoices(checkboxConfig.choices);
 
     const checkboxQuestion: CheckboxQuestion = {
@@ -241,7 +241,7 @@ export default class Prompt<T extends Answers> {
     return this;
   }
 
-  addPassword(passwordConfig: PasswordConfig) {
+  public addPassword(passwordConfig: PasswordConfig) {
     const passwordQuestion: PasswordQuestion = {
       type: "password",
       name: passwordConfig.name,
@@ -258,7 +258,7 @@ export default class Prompt<T extends Answers> {
     return this;
   }
 
-  addEditor(editorConfig: EditorConfig) {
+  public addEditor(editorConfig: EditorConfig) {
     const editorQuestion: EditorQuestion = {
       type: "editor",
       name: editorConfig.name,
@@ -275,7 +275,7 @@ export default class Prompt<T extends Answers> {
     return this;
   }
 
-  execute(callback?: (values: T) => void) {
+  public execute(callback?: (values: T) => void) {
     return this.promptModule<T>(Object.values(this.prompts)).then((values) => {
       Object.keys(values).forEach((key) => {
         if (["list", "rawlist"].includes(this.prompts[key].type!)) {
