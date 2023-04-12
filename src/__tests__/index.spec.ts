@@ -7,23 +7,23 @@ import {
 } from "@/index";
 
 describe("@oishi/cli-core", () => {
-  it("CliCore 可用", () => {
+  test("CliCore 可用", () => {
     expect(CliCore).toBeDefined();
   });
 
-  it("CliCommand 可用", () => {
+  test("CliCommand 可用", () => {
     expect(CliCommand).toBeDefined();
   });
 
-  it("createCronJob 可用", () => {
+  test("createCronJob 可用", () => {
     expect(createCronJob).toBeDefined();
   });
 
-  it("createPrompt 可用", () => {
+  test("createPrompt 可用", () => {
     expect(createPrompt).toBeDefined();
   });
 
-  it("createTask 可用", () => {
+  test("createTask 可用", () => {
     expect(createTask).toBeDefined();
   });
 });

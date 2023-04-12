@@ -2,9 +2,9 @@ import createLogger from "@/util/createLogger";
 import createRunCmd from "@/util/createRunCmd";
 
 describe("createLogger", () => {
-  it("createLogger", () => {});
+  test("createLogger", () => {});
 });
 
 describe("createRunCmd", () => {
-  it("createRunCmd", () => {});
+  test("createRunCmd", () => {});
 });

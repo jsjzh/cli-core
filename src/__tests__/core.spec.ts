@@ -2,9 +2,9 @@ import CliCore from "@/core/cliCore";
 import cliCommand from "@/core/cliCommand";
 
 describe("CliCore", () => {
-  it("CliCore", () => {});
+  test("CliCore", () => {});
 });
 
 describe("cliCommand", () => {
-  it("cliCommand", () => {});
+  test("cliCommand", () => {});
 });

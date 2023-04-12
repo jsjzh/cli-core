@@ -3,7 +3,7 @@ import Prompt, { createPrompt } from "@/shared/prompt";
 import Task, { createTask } from "@/shared/task";
 
 describe("cron", () => {
-  it("cron", () => {
+  test("cron", () => {
     expect(
       createCronJob({
         cronTime: "* * * * * *",
@@ -16,13 +16,43 @@ describe("cron", () => {
 });
 
 describe("prompt", () => {
-  it("prompt", () => {
+  test("prompt", () => {
     expect(createPrompt()).toBeInstanceOf(Prompt);
   });
 });
 
 describe("task", () => {
-  it("task", () => {
-    expect(createTask()).toBeInstanceOf(Task);
+  test("task", async () => {
+    expect(createTask({ showLog: false })).toBeInstanceOf(Task);
+
+    await expect(
+      createTask()
+        .add({
+          title: "demo",
+          task() {
+            console.log("hello world");
+          },
+        })
+        .execute(),
+    ).resolves.toBeUndefined();
+
+    await expect(
+      createTask()
+        .add([
+          {
+            title: "demo 1",
+            task() {
+              console.log("hello world");
+            },
+          },
+          {
+            title: "demo 2",
+            task() {
+              console.log("hello world");
+            },
+          },
+        ])
+        .execute(),
+    ).resolves.toBeUndefined();
   });
 });
