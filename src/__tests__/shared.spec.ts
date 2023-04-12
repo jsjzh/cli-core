@@ -63,8 +63,8 @@ describe("prompt", () => {
 
     expect(prompt.addEditor({ name: "addEditor" })).toBeInstanceOf(Prompt);
 
-    test.todo("验证命令行输入值", () => {
-      prompt.execute();
+    test.todo("验证命令行输入值", async () => {
+      const data = await prompt.execute();
     });
   });
 });

@@ -11,6 +11,7 @@ const createRunCmd =
       if (showExecuteCmd) {
         logger.info(`将在 ${cwd} 运行指令 ${cmd}`);
       }
+
       return execSync(cmd, {
         cwd,
         stdio,
