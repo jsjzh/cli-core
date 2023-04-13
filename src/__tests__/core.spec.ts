@@ -48,7 +48,6 @@ describe.todo("cliCommand", () => {
           default: "foo",
           optional: true,
         },
-        // TODO 如果是直接写的，那应该是转为 input，而不是 choices 报错
         dev: {
           description: "输入 push 的内容",
         },

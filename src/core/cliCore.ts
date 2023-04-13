@@ -90,74 +90,80 @@ export default class CliCore {
 
       if (_opts.interactive) {
         const createCliCorePrompt = (commands: CliCommand[]) => {
-          createPrompt<{
-            command: CliCommand;
-          }>({ prefix: this.baseConfig.name })
-            .addRawList({
-              name: "command",
-              description: "please select the next command",
-              choices: commands.map((command) => ({
-                key: command.baseConfig.name,
-                value: command,
-              })),
-            })
-            .execute((answers) => {
-              const command = answers.command;
+          if (!commands.length) {
+            this.logger.error(
+              "请先配置 CliCore 的 commands 再使用交互式命令行",
+            );
+          } else {
+            createPrompt<{
+              command: CliCommand;
+            }>({ prefix: this.baseConfig.name })
+              .addRawList({
+                name: "command",
+                description: "请选择下一级 command",
+                choices: commands.map((command) => ({
+                  key: command.baseConfig.name,
+                  value: command,
+                })),
+              })
+              .execute((answers) => {
+                const command = answers.command;
 
-              if (
-                Array.isArray(command.baseConfig.commands) &&
-                command.baseConfig.commands.length
-              ) {
-                createCliCorePrompt(command.baseConfig.commands);
-              } else {
-                const prompt = createPrompt({
-                  prefix: this.baseConfig.name,
-                });
-
-                const _mergeParams = {
-                  ...command.baseConfig.arguments,
-                  ...command.baseConfig.options,
-                };
-
-                Object.keys(_mergeParams).forEach((name) => {
-                  // 只有参数为必选的时候，才会被 prompt 所接收
-                  if (!_mergeParams[name].optional) {
-                    if (
-                      _mergeParams[name].choices &&
-                      _mergeParams[name].multiple
-                    ) {
-                      prompt.addCheckbox({
-                        name,
-                        description: _mergeParams[name].description,
-                        choices: _mergeParams[name].choices!,
-                        default: _mergeParams[name].default,
-                      });
-                    } else if (Array.isArray(_mergeParams[name].choices)) {
-                      prompt.addList({
-                        name,
-                        description: _mergeParams[name].description,
-                        choices: _mergeParams[name].choices!,
-                        default: _mergeParams[name].default[0],
-                      });
-                    } else {
-                      prompt.addInput({
-                        name,
-                        description: _mergeParams[name].description,
-                        default: _mergeParams[name].default[0],
-                      });
-                    }
-                  }
-                });
-
-                prompt.execute((answers) => {
-                  command.baseConfig.action({
-                    data: answers,
-                    logger: this.logger,
-                    runCmd: this.runCmd,
+                if (
+                  Array.isArray(command.baseConfig.commands) &&
+                  command.baseConfig.commands.length
+                ) {
+                  createCliCorePrompt(command.baseConfig.commands);
+                } else {
+                  const prompt = createPrompt({
+                    prefix: this.baseConfig.name,
                   });
-                });
-              }
-            });
+
+                  const _mergeParams = {
+                    ...command.baseConfig.arguments,
+                    ...command.baseConfig.options,
+                  };
+
+                  Object.keys(_mergeParams).forEach((name) => {
+                    // 只有参数为必选的时候，才会被 prompt 所接收
+                    if (!_mergeParams[name].optional) {
+                      if (
+                        _mergeParams[name].choices &&
+                        _mergeParams[name].multiple
+                      ) {
+                        prompt.addCheckbox({
+                          name,
+                          description: _mergeParams[name].description,
+                          choices: _mergeParams[name].choices!,
+                          default: _mergeParams[name].default,
+                        });
+                      } else if (Array.isArray(_mergeParams[name].choices)) {
+                        prompt.addList({
+                          name,
+                          description: _mergeParams[name].description,
+                          choices: _mergeParams[name].choices!,
+                          default: _mergeParams[name].default[0],
+                        });
+                      } else {
+                        prompt.addInput({
+                          name,
+                          description: _mergeParams[name].description,
+                          default: _mergeParams[name].default[0],
+                        });
+                      }
+                    }
+                  });
+
+                  prompt.execute((answers) => {
+                    command.baseConfig.action({
+                      data: answers,
+                      logger: this.logger,
+                      runCmd: this.runCmd,
+                    });
+                  });
+                }
+              });
+          }
         };
 
         createCliCorePrompt(this.baseConfig.commands);
