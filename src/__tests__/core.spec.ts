@@ -1,3 +1,5 @@
+import { describe, test, expect } from "vitest";
+
 import CliCore from "@/core/cliCore";
 import CliCommand from "@/core/cliCommand";
 
