@@ -248,6 +248,8 @@ export default class CliCommand<
         {} as Record<string, any>,
       );
 
+      console.log("currArgs", currArgs);
+
       Object.keys(currArgs).forEach((key) => {
         if (!currArgs[key] && this.baseConfig.arguments[key].default) {
           currArgs[key] = this.baseConfig.arguments[key].default;
@@ -259,13 +261,15 @@ export default class CliCommand<
 
         currArgs[key].forEach((valueKey: string) => {
           currArgs[key] =
-            this.baseConfig.arguments[key].choices!.find(
+            this.baseConfig.arguments[key].choices?.find(
               (choice) => choice.key === valueKey,
             )?.value ?? currArgs[key][valueKey];
         });
       });
 
       const currOpts = _opts;
+
+      console.log("currOpts", currOpts);
 
       Object.keys(currOpts).forEach((key) => {
         if (!currOpts[key] && this.baseConfig.options[key].default) {
@@ -278,7 +282,7 @@ export default class CliCommand<
 
         currOpts[key].forEach((valueKey: string) => {
           currOpts[key] =
-            this.baseConfig.options[key].choices!.find(
+            this.baseConfig.options[key].choices?.find(
               (choice) => choice.key === valueKey,
             )?.value ?? currOpts[key][valueKey];
         });
