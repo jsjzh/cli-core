@@ -44,7 +44,7 @@
     "@types/cron": "^2.0.1",
     "@types/inquirer": "^9.0.3",
     "@types/node": "^18.15.11",
-    "commander": "^10.0.0",
+    "commander": "^10.0.1",
     "cron": "^2.3.0",
     "inquirer": "^9.1.5",
     "tslib": "^2.5.0",
