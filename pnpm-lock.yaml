@@ -17,8 +17,8 @@ dependencies:
     specifier: ^2.3.0
     version: 2.3.0
   inquirer:
-    specifier: ^9.1.5
-    version: 9.1.5
+    specifier: ^9.2.0
+    version: 9.2.0
   tslib:
     specifier: ^2.5.0
     version: 2.5.0
@@ -1406,8 +1406,8 @@ packages:
   /inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
-  /inquirer@9.1.5:
-    resolution: {integrity: sha512-3ygAIh8gcZavV9bj6MTdYddG2zPSYswP808fKS46NOwlF0zZljVpnLCHODDqItWJDbDpLb3aouAxGaJbkxoppA==}
+  /inquirer@9.2.0:
+    resolution: {integrity: sha512-WWERbVqjsTXjXub1ZW0ZHDit1dyHqy0T9XIkky9TnmKAPrjU9Jkd59nZPK0dUuM3s73GZAZu2Jo4iFU3XSPVLA==}
     engines: {node: '>=14.18.0'}
     dependencies:
       ansi-escapes: 6.0.0
