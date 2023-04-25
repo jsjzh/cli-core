@@ -206,8 +206,13 @@ export default class CliCommand<
         argument.choices(item.choices.map((choice) => choice.key));
       }
 
-      const currentDefault = item.default.join(", ");
-      argument.default(currentDefault, currentDefault);
+      if (Array.isArray(item.choices) || item.optional) {
+        // MARK 发现一个点，就如果是 input 输入的 arguments
+        // 是没有办法设置 input 的 default 的
+        // 也符合逻辑
+        const currentDefault = item.default.join(", ");
+        argument.default(currentDefault, currentDefault);
+      }
 
       return argument;
     });
@@ -248,8 +253,6 @@ export default class CliCommand<
         {} as Record<string, any>,
       );
 
-      console.log("currArgs", currArgs);
-
       Object.keys(currArgs).forEach((key) => {
         if (!currArgs[key] && this.baseConfig.arguments[key].default) {
           currArgs[key] = this.baseConfig.arguments[key].default;
@@ -260,16 +263,18 @@ export default class CliCommand<
         }
 
         currArgs[key].forEach((valueKey: string) => {
-          currArgs[key] =
-            this.baseConfig.arguments[key].choices?.find(
-              (choice) => choice.key === valueKey,
-            )?.value ?? currArgs[key][valueKey];
+          if (Array.isArray(this.baseConfig.arguments[key].choices)) {
+            currArgs[key] =
+              this.baseConfig.arguments[key].choices!.find(
+                (choice) => choice.key === valueKey,
+              )?.value ?? currArgs[key][valueKey];
+          } else {
+            currArgs[key] = currArgs[key][0];
+          }
         });
       });
 
       const currOpts = _opts;
-
-      console.log("currOpts", currOpts);
 
       Object.keys(currOpts).forEach((key) => {
         if (!currOpts[key] && this.baseConfig.options[key].default) {
@@ -281,10 +286,14 @@ export default class CliCommand<
         }
 
         currOpts[key].forEach((valueKey: string) => {
-          currOpts[key] =
-            this.baseConfig.options[key].choices?.find(
-              (choice) => choice.key === valueKey,
-            )?.value ?? currOpts[key][valueKey];
+          if (Array.isArray(this.baseConfig.options[key].choices)) {
+            currOpts[key] =
+              this.baseConfig.options[key].choices!.find(
+                (choice) => choice.key === valueKey,
+              )?.value ?? currOpts[key][valueKey];
+          } else {
+            currOpts[key] = currOpts[key][0];
+          }
         });
       });
 
@@ -299,10 +308,12 @@ export default class CliCommand<
   public registerCommand(cliCore: CliCore) {
     const args = this.createArguments();
     const opts = this.createOptions();
+
     const action = this.createAction(cliCore);
 
     args.forEach((arg) => this.childProgram.addArgument(arg));
     opts.forEach((arg) => this.childProgram.addOption(arg));
+
     this.childProgram.action(action);
 
     this.baseConfig.commands.forEach((command) =>
