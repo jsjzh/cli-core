@@ -43,10 +43,10 @@
   "dependencies": {
     "@types/cron": "^2.0.1",
     "@types/inquirer": "^9.0.3",
-    "@types/node": "^18.16.3",
+    "@types/node": "^18.16.5",
     "commander": "^10.0.1",
     "cron": "^2.3.0",
-    "inquirer": "^9.2.0",
+    "inquirer": "^9.2.1",
     "tslib": "^2.5.0",
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1"
@@ -56,7 +56,7 @@
     "@typescript-eslint/parser": "^5.59.2",
     "@vitest/coverage-c8": "^0.30.1",
     "esbuild": "^0.17.18",
-    "eslint": "^8.39.0",
+    "eslint": "^8.40.0",
     "eslint-config-alloy": "^4.9.0",
     "prettier": "^2.8.8",
     "typescript": "^4.9.5",
