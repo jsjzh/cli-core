@@ -45,9 +45,9 @@
     "@types/inquirer": "^9.0.3",
     "@types/node": "^18.17.0",
     "commander": "^10.0.1",
-    "cron": "^2.3.1",
+    "cron": "^2.4.0",
     "inquirer": "^9.2.8",
-    "tslib": "^2.6.0",
+    "tslib": "^2.6.1",
     "winston": "^3.10.0",
     "winston-daily-rotate-file": "^4.7.1"
   },
