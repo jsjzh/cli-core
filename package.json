@@ -43,9 +43,9 @@
   "dependencies": {
     "@types/cron": "^2.4.0",
     "@types/inquirer": "^9.0.3",
-    "@types/node": "^18.17.19",
+    "@types/node": "^18.18.0",
     "commander": "^10.0.1",
-    "cron": "^2.4.3",
+    "cron": "^2.4.4",
     "inquirer": "^9.2.11",
     "tslib": "^2.6.2",
     "winston": "^3.10.0",
