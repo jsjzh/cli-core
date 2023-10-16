@@ -43,7 +43,7 @@
   "dependencies": {
     "@types/cron": "^2.4.0",
     "@types/inquirer": "^9.0.4",
-    "@types/node": "^18.18.4",
+    "@types/node": "^18.18.5",
     "commander": "^10.0.1",
     "cron": "^2.4.4",
     "inquirer": "^9.2.11",
