@@ -43,7 +43,7 @@
   "dependencies": {
     "@types/cron": "^2.4.0",
     "@types/inquirer": "^9.0.7",
-    "@types/node": "^18.18.13",
+    "@types/node": "^18.19.2",
     "commander": "^10.0.1",
     "cron": "^2.4.4",
     "inquirer": "^9.2.12",
@@ -56,7 +56,7 @@
     "@typescript-eslint/parser": "^5.62.0",
     "@vitest/coverage-c8": "^0.30.1",
     "esbuild": "^0.17.19",
-    "eslint": "^8.54.0",
+    "eslint": "^8.55.0",
     "eslint-config-alloy": "^4.9.0",
     "prettier": "^2.8.8",
     "typescript": "^4.9.5",
