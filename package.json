@@ -43,12 +43,12 @@
   "dependencies": {
     "@types/cron": "^2.4.0",
     "@types/inquirer": "^9.0.7",
-    "@types/node": "^18.19.25",
+    "@types/node": "^18.19.30",
     "commander": "^10.0.1",
     "cron": "^2.4.4",
-    "inquirer": "^9.2.16",
+    "inquirer": "^9.2.17",
     "tslib": "^2.6.2",
-    "winston": "^3.12.0",
+    "winston": "^3.13.0",
     "winston-daily-rotate-file": "^4.7.1"
   },
   "devDependencies": {
